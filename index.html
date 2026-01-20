@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hayley's Tutor - JMCBTech</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .animate-bounce { animation: bounce 1s infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+      50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const historyQuestionDatabase = [
+      { id: "h1", category: "Government Types", difficulty: "focus", question: "\"The Sapa Inca is a god-like figure who also has control over the government.\" This quote describes which type of government?", options: ["Monarchy", "Democracy", "Theocracy", "Imperialism"], correct: 2, explanation: "THEOCRACY! Remember: THEO = GOD. The Sapa Inca was believed to be divine AND controlled the government.", source: "Week 4 Quiz" },
+      { id: "h2", category: "Government Types", difficulty: "focus", question: "What is the KEY difference between a Theocracy and a Monarchy?", options: ["Theocracy has voting, Monarchy doesn't", "In Theocracy the ruler is seen as a GOD; in Monarchy the ruler is just a king/queen", "Monarchy is older than Theocracy", "There is no difference"], correct: 1, explanation: "In a THEOCRACY, the ruler is believed to be divine (god-like). In a MONARCHY, the ruler is human royalty (king/queen).", source: "Focus Concept" },
+      { id: "h3", category: "Government Types", difficulty: "medium", question: "\"Divine principles guide the state's governance, with religious leaders exercising authority in both spiritual matters and political decisions.\" This describes which leader?", options: ["Aztec Emperor", "Clan Mother", "Conquistadors", "Sapa Inca"], correct: 3, explanation: "The Sapa Inca ruled as both a religious AND political leader - this is a THEOCRACY.", source: "Mastery Assessment" },
+      { id: "h4", category: "Government Types", difficulty: "medium", question: "Which of the following accurately defines theocracy?", options: ["Government with religious leaders", "Government with a woman leader", "Government with no leader", "None of the above"], correct: 0, explanation: "A THEOCRACY is a government where religious leaders (or god-like rulers) have control. THEO = GOD.", source: "Week 10 Quiz" },
+      { id: "h5", category: "Government Types", difficulty: "medium", question: "\"Some rulers believe their authority is granted by a higher power, making their decisions unquestionable.\" This describes:", options: ["Polytheism", "Divine Right of Kings", "Magna Carta", "Feudal System"], correct: 1, explanation: "DIVINE RIGHT OF KINGS = the belief that a king's power comes from God, so no one can question them.", source: "Mastery Assessment" },
+      { id: "h6", category: "Government Types", difficulty: "hard", question: "How is the Magna Carta different from the Divine Right of Kings?", options: ["The Magna Carta LIMITED the king's power, while Divine Right gave ABSOLUTE power", "The Magna Carta gave the king MORE power", "The Magna Carta established the king's right to rule by birth", "The Magna Carta supported the Divine Right of Kings"], correct: 0, explanation: "Magna Carta = LIMITS king's power. Divine Right = UNLIMITED power from God. They are OPPOSITES!", source: "Week 7 Quiz" },
+      { id: "h7", category: "Imperialism & Isolationism", difficulty: "focus", question: "\"The more we interact with foreign empires, the more divided we become. It is best we look inward and avoid their conflicts.\" This quote supports which policy?", options: ["Imperialism", "Nationalism", "Globalization", "Isolationism"], correct: 3, explanation: "ISOLATIONISM! Key words: 'look inward,' 'avoid.' Isolationism = staying OUT of other countries' business.", source: "Week 9 Quiz" },
+      { id: "h8", category: "Imperialism & Isolationism", difficulty: "focus", question: "\"Driven by the thirst for wealth and glory, we embarked on journeys to conquer new lands and expand our empire.\" This reflects:", options: ["Scientific curiosity", "Religious missionary zeal", "Economic gain and territorial expansion", "Cultural exchange"], correct: 2, explanation: "Key words: 'conquer,' 'expand,' 'empire' = IMPERIALISM (economic gain and territorial expansion).", source: "Week 19 Quiz" },
+      { id: "h9", category: "Imperialism & Isolationism", difficulty: "medium", question: "What is ISOLATIONISM?", options: ["A country taking over other lands", "A country avoiding involvement in other nations' affairs", "A country spreading its religion", "A country building an empire"], correct: 1, explanation: "ISOLATIONISM = ISOLATE = staying ALONE, avoiding other countries' business. The OPPOSITE of imperialism.", source: "Week 7 Quiz" },
+      { id: "h10", category: "Imperialism & Isolationism", difficulty: "medium", question: "What type of foreign policy was George Washington supporting when he said to 'trade with other countries but stay out of their politics'?", options: ["Imperialism", "Isolationism", "Nationalism", "Colonialism"], correct: 1, explanation: "George Washington supported ISOLATIONISM - trade with others, but don't get involved in their wars or politics.", source: "Week 6 Quiz" },
+      { id: "h11", category: "3 G's of Exploration", difficulty: "focus", question: "\"I and my companions suffer from a disease of the heart which can be cured only with gold.\" - Hernán Cortés. This quote represents which motive?", options: ["Raising awareness about heart disease", "One of the three motives for conquistador exploration", "Origins of heart support", "The conquistadors offering gold to the Aztecs"], correct: 1, explanation: "This shows the GOLD motive! Cortés was SEEKING gold, not giving it away. The 3 G's: Gold, God, Glory.", source: "Week 4 Quiz" },
+      { id: "h12", category: "3 G's of Exploration", difficulty: "medium", question: "\"Our desire with this newly discovered city, Tenochtitlan, is for all citizens to stop accepting polytheistic ways and follow our way of prayer.\" Which motive is expressed?", options: ["Glory", "God", "Gold", "None"], correct: 1, explanation: "GOD motive! Key words: 'stop polytheistic ways,' 'follow our way of prayer' = spreading Christianity.", source: "Week 7 Quiz" },
+      { id: "h13", category: "3 G's of Exploration", difficulty: "medium", question: "\"The jewels and diamonds have enticed our leaders to get greedier and greedier.\" Which motive is expressed?", options: ["Glory", "God", "Gold", "None"], correct: 2, explanation: "GOLD motive! Key words: 'jewels,' 'diamonds,' 'greedier' = wanting wealth and riches.", source: "Week 7 Quiz" },
+      { id: "h14", category: "3 G's of Exploration", difficulty: "easy", question: "What are the THREE reasons (3 G's) that conquistadors explored the Americas?", options: ["Guns, Germs, Steel", "Gold, God, Glory", "Greece, Germany, Gaul", "Government, Geography, Growth"], correct: 1, explanation: "The 3 G's: GOLD (wealth), GOD (spreading Christianity), GLORY (fame and power).", source: "Core Concept" },
+      { id: "h15", category: "3 G's of Exploration", difficulty: "medium", question: "Why is Hernán Cortés significant?", options: ["He drew the Codex Mendoza", "He saved the Aztec Empire", "He was leader of the conquistadors that conquered the Aztecs", "He wanted to give the Aztecs gold"], correct: 2, explanation: "Hernán Cortés LED the Spanish conquistadors who CONQUERED the AZTEC Empire.", source: "Week 4 Quiz" },
+      { id: "h16", category: "Civilizations", difficulty: "medium", question: "What is one SIMILARITY between the Aztecs and Incas?", options: ["They were both monotheistic", "They both conquered England", "They both put women in charge", "They both practiced human sacrifice"], correct: 3, explanation: "Both Aztecs and Incas practiced human sacrifice AND were polytheistic (believed in many gods).", source: "Mastery Assessment" },
+      { id: "h17", category: "Civilizations", difficulty: "focus", question: "Which statement about religion is TRUE?", options: ["All three groups are monotheistic", "Aztecs and Inca are monotheistic, Haudenosaunee is polytheistic", "Haudenosaunee is monotheistic, Aztec and Inca are polytheistic", "Francisco Pizarro conquered the Aztecs"], correct: 2, explanation: "Haudenosaunee = MONOTHEIST (ONE god). Aztec & Inca = POLYTHEIST (MANY gods). This is a KEY difference!", source: "Week 7 Quiz" },
+      { id: "h18", category: "Civilizations", difficulty: "medium", question: "Which civilization gave women the MOST power?", options: ["Haudenosaunee", "Inca", "Aztec", "None gave women power"], correct: 0, explanation: "HAUDENOSAUNEE! Clan Mothers had real power - they chose the leaders.", source: "Week 10 Quiz" },
+      { id: "h19", category: "Civilizations", difficulty: "medium", question: "The Aztecs used floating gardens called:", options: ["Terraces", "Quipus", "Three Sisters", "Chinampas"], correct: 3, explanation: "CHINAMPAS = Aztec floating gardens! Quipus = Inca. Three Sisters = Haudenosaunee.", source: "Mastery Assessment" },
+      { id: "h20", category: "Civilizations", difficulty: "medium", question: "What is the practice of 'Three Sisters' farming?", options: ["Cultivating three types of fruits", "Rotating crops through fields", "Growing corn, beans, and squash together", "Using three irrigation methods"], correct: 2, explanation: "Three Sisters = corn, beans, and squash grown together. This was a HAUDENOSAUNEE practice.", source: "Week 10 Quiz" },
+      { id: "h21", category: "Civilizations", difficulty: "medium", question: "\"Though they had no writing system, this group recorded through an intricate series of knots and cords.\" Which group?", options: ["Haudenosaunee", "Aztecs", "Inca", "Europeans"], correct: 2, explanation: "INCA used QUIPUS (knotted cords) for record-keeping. Aztecs used GLYPHS.", source: "Week 9 Quiz" },
+      { id: "h22", category: "Civilizations", difficulty: "easy", question: "Who conquered the Aztec Empire?", options: ["Francisco Pizarro", "Hernán Cortés", "The Sapa Inca", "The King of Spain"], correct: 1, explanation: "HERNÁN CORTÉS conquered the AZTECS. FRANCISCO PIZARRO conquered the INCAS. Don't mix them up!", source: "Week 10 Quiz" },
+      { id: "h23", category: "Civilizations", difficulty: "medium", question: "The Great Law of Peace was created by which group?", options: ["Inca", "Aztecs", "Conquistadors", "Haudenosaunee"], correct: 3, explanation: "The HAUDENOSAUNEE (Iroquois) created the Great Law of Peace to unite their nations.", source: "Week 6 Quiz" },
+      { id: "h24", category: "Sources", difficulty: "easy", question: "Your World History textbook or an encyclopedia is a:", options: ["Primary Source", "Secondary Source", "Not a source", "Both A and B"], correct: 1, explanation: "SECONDARY SOURCE! It was written AFTER the events to EXPLAIN history.", source: "Week 4 Quiz" },
+      { id: "h25", category: "Sources", difficulty: "focus", question: "The Aztecs used picture-symbols to record information. These are called:", options: ["Pictures", "Sketches", "Glyphs", "None of the above"], correct: 2, explanation: "GLYPHS! Aztec glyphs are symbols/pictures with meaning - used instead of letters.", source: "Week 4 Quiz" },
+      { id: "h26", category: "Medieval Europe", difficulty: "medium", question: "In the Feudal System, which group is responsible for PROTECTION?", options: ["King", "Nobles", "Vassals/Knights", "Peasants"], correct: 2, explanation: "VASSALS/KNIGHTS provided protection in exchange for land.", source: "Mastery Assessment" },
+      { id: "h27", category: "Medieval Europe", difficulty: "medium", question: "\"This hero led troops into battle during the Hundred Years' War and claimed divine visions.\" Who is this?", options: ["King of England", "Joan of Arc", "Clan Mother", "Queen Elizabeth I"], correct: 1, explanation: "JOAN OF ARC! She led French soldiers to victory during the Hundred Years' War.", source: "Week 9 Quiz" },
+      { id: "h28", category: "Medieval Europe", difficulty: "medium", question: "What was the main goal of the Crusades for European Christians?", options: ["To explore new lands", "To protect from Vikings", "To reclaim the Holy Land from Muslim control", "To establish kingdoms in Africa"], correct: 2, explanation: "The Crusades = Christian Europeans trying to reclaim the Holy Land (Jerusalem).", source: "Mastery Assessment" },
+      { id: "h29", category: "Medieval Europe", difficulty: "medium", question: "What was the primary cause of the Black Death spreading?", options: ["Contaminated water", "The Hundred Years' War", "Flea-infested rats carrying bacteria", "Contaminated food"], correct: 2, explanation: "RATS with FLEAS spread the Black Death (bubonic plague).", source: "Week 10 Quiz" },
+      { id: "h30", category: "Civilizations", difficulty: "easy", question: "Social Hierarchy is defined as:", options: ["A theocracy", "The ranking of people by power and status", "Polytheism", "Gold"], correct: 1, explanation: "SOCIAL HIERARCHY = ranking people from most powerful to least powerful.", source: "Mastery Assessment" },
+    ];
+
+    const mathQuestionDatabase = [
+      { id: "m1", category: "Percents", difficulty: "focus", question: "What is the meaning of percent?", options: ["A ratio to 10", "A ratio to 100", "A ratio to 1000", "Any fraction"], correct: 1, explanation: "PERCENT means 'per hundred' or 'out of 100.' So 45% means 45 out of 100!", source: "Topic 6 Review" },
+      { id: "m2", category: "Percents", difficulty: "focus", question: "Write 35% as a fraction in simplest form.", options: ["35/10", "7/20", "3/5", "1/35"], correct: 1, explanation: "35% = 35/100. Simplify: 35÷5=7 and 100÷5=20. So 35% = 7/20!", source: "Topic 6 Review" },
+      { id: "m3", category: "Percents", difficulty: "medium", question: "Write 35% as a decimal.", options: ["3.5", "0.35", "35.0", "0.035"], correct: 1, explanation: "To convert percent to decimal, DIVIDE BY 100. 35% = 0.35", source: "Topic 6 Review" },
+      { id: "m4", category: "Percents", difficulty: "medium", question: "A player made 17 out of 20 free throws. What percent did they MISS?", options: ["85%", "17%", "15%", "3%"], correct: 2, explanation: "Made 17 means MISSED 3. 3/20 = 15/100 = 15% missed!", source: "Mid-Topic 6" },
+      { id: "m5", category: "Percents", difficulty: "hard", question: "Write 221% as a decimal.", options: ["2.21", "22.1", "0.221", "221.0"], correct: 0, explanation: "221% ÷ 100 = 2.21. Percents over 100% become decimals greater than 1!", source: "Lesson 6-3" },
+      { id: "m6", category: "Percents", difficulty: "medium", question: "Estimate 24% of 83.", options: ["About 8", "About 20", "About 24", "About 83"], correct: 1, explanation: "24% ≈ 25% = ¼. Round 83 to 80. ¼ × 80 = 20!", source: "Lesson 6-4" },
+      { id: "m7", category: "Percents", difficulty: "focus", question: "The Murphy family traveled 30% on day 1 and ¼ on day 2. What PERCENT is left?", options: ["45%", "55%", "25%", "70%"], correct: 0, explanation: "Day 1: 30%. Day 2: ¼ = 25%. Total: 55%. Left: 100% - 55% = 45%!", source: "Mid-Topic 6" },
+      { id: "m8", category: "Percents", difficulty: "hard", question: "80% of what number is 96?", options: ["76.8", "120", "116", "96"], correct: 1, explanation: "0.80 × n = 96. Divide: n = 96 ÷ 0.8 = 120.", source: "Lesson 6-6" },
+      { id: "m9", category: "Percents", difficulty: "hard", question: "What is 16% of 73.5?", options: ["11.76", "4.59", "117.6", "1.176"], correct: 0, explanation: "0.16 × 73.5 = 11.76", source: "Lesson 6-5" },
+      { id: "m10", category: "Fractions", difficulty: "focus", question: "Find the difference: 8¼ - 3⅚", options: ["5⁵⁄₁₂", "4³⁄₄", "4⁵⁄₁₂", "5¹⁄₁₂"], correct: 2, explanation: "Convert to improper, find LCM=12, subtract: 99/12 - 46/12 = 53/12 = 4⁵⁄₁₂", source: "Tri 1 Final" },
+      { id: "m11", category: "Fractions", difficulty: "focus", question: "Which of these is an IMPROPER fraction?", options: ["3⅓", "11/4", "6.75", "12/12"], correct: 1, explanation: "IMPROPER = numerator LARGER than denominator. 11/4 has 11 > 4!", source: "Tri 1 Final" },
+      { id: "m12", category: "Fractions", difficulty: "medium", question: "Recipe calls for 1¾ cups flour. If you TRIPLE it, how much flour?", options: ["3⁹⁄₁₂ cups", "4¼ cups", "3¾ cups", "5¼ cups"], correct: 3, explanation: "7/4 × 3 = 21/4 = 5¼ cups!", source: "Tri 1 Final" },
+      { id: "m13", category: "Fractions", difficulty: "medium", question: "Recipe calls for ⅔ cup sugar. For 6 batches, how much sugar?", options: ["⅔ cup", "2/18 cup", "4 cups", "3 cups"], correct: 2, explanation: "⅔ × 6 = 12/3 = 4 cups!", source: "Tri 1 Final" },
+      { id: "m14", category: "Fractions", difficulty: "hard", question: "Baker has 2½ cups sprinkles. Each cupcake needs ⅙ cup. How many cupcakes?", options: ["14", "10", "30", "15"], correct: 3, explanation: "5/2 ÷ 1/6 = 5/2 × 6/1 = 30/2 = 15 cupcakes!", source: "Tri 1 Final" },
+      { id: "m15", category: "Fractions", difficulty: "focus", question: "The INVERSE of a fraction is called its:", options: ["Quotient", "Flip", "Reciprocal", "Product"], correct: 2, explanation: "RECIPROCAL = flip numerator and denominator!", source: "Tri 1 Final" },
+      { id: "m16", category: "Fractions", difficulty: "medium", question: "5/6 × 2/9 = ?", options: ["5/27", "7/15", "3/3", "10/15"], correct: 0, explanation: "5×2=10, 6×9=54. Simplify: 10/54 = 5/27", source: "Unit 1 Review" },
+      { id: "m17", category: "Fractions", difficulty: "medium", question: "4/5 ÷ 2/3 = ?", options: ["8/15", "6/5 = 1⅕", "2/5", "12/10"], correct: 1, explanation: "Keep-Change-Flip! 4/5 × 3/2 = 12/10 = 6/5 = 1⅕", source: "Unit 1 Review" },
+      { id: "m18", category: "Decimals", difficulty: "focus", question: "Tricia has $37.25. She writes a check for $23.99. How much is left?", options: ["$12.36", "$12.74", "$13.26", "$13.74"], correct: 2, explanation: "$37.25 - $23.99 = $13.26", source: "Tri 1 Final" },
+      { id: "m19", category: "Decimals", difficulty: "medium", question: "45.67 + 3.45 = ?", options: ["49.12", "48.12", "49.02", "80.17"], correct: 0, explanation: "Line up decimals! 45.67 + 3.45 = 49.12", source: "Unit 1 Review" },
+      { id: "m20", category: "Decimals", difficulty: "hard", question: "96.48 ÷ 0.12 = ?", options: ["8.04", "80.4", "804", "8040"], correct: 2, explanation: "Move decimal 2 places: 9648 ÷ 12 = 804", source: "Unit 1 Review" },
+      { id: "m21", category: "Decimals", difficulty: "medium", question: "What is 285 ÷ 15?", options: ["17", "28", "19", "21"], correct: 2, explanation: "15 × 19 = 285. Answer is 19!", source: "Tri 1 Final" },
+      { id: "m22", category: "Expressions", difficulty: "focus", question: "Which expression equals 2(6y - 4)?", options: ["8y - 2", "4(3y - 2)", "12(y - 1)", "12y - 8"], correct: 3, explanation: "DISTRIBUTIVE PROPERTY! 2×6y - 2×4 = 12y - 8", source: "Tri 1 Final" },
+      { id: "m23", category: "Expressions", difficulty: "focus", question: "Phone plan: $75/month + $0.17/minute. If x = minutes, which shows monthly cost?", options: ["75.17x", "75 + 0.17x", "75(0.17x)", "75x ÷ 0.17"], correct: 1, explanation: "$75 base + $0.17 per minute = 75 + 0.17x", source: "Tri 1 Final" },
+      { id: "m24", category: "Expressions", difficulty: "medium", question: "Which expression = '7 fewer than 4 times a number x'?", options: ["7x - 4", "4 - 7x", "4x - 7", "7 - 4x"], correct: 2, explanation: "'4 times' = 4x. '7 fewer than' = subtract 7. Answer: 4x - 7", source: "Tri 1 Final" },
+      { id: "m25", category: "Coordinate Plane", difficulty: "focus", question: "Ordered pair for 3 units RIGHT and 2 units UP from origin?", options: ["(-3, -2)", "(3, 2)", "(2, 3)", "(-3, 2)"], correct: 1, explanation: "RIGHT = +x, UP = +y. Answer: (3, 2). Always x first!", source: "Tri 1 Final" },
+      { id: "m26", category: "Coordinate Plane", difficulty: "medium", question: "If a point is at (-0.5, -0.25), which quadrant?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], correct: 2, explanation: "Both negative = Quadrant III! Q1(+,+) Q2(-,+) Q3(-,-) Q4(+,-)", source: "Tri 1 Final" },
+      { id: "m27", category: "Integers", difficulty: "focus", question: "Temperature was -3°F. It INCREASED by 7°. What's the new temp?", options: ["-10°F", "-4°F", "+4°F", "+10°F"], correct: 2, explanation: "-3 + 7 = +4°F!", source: "Tri 1 Final" },
+      { id: "m28", category: "Integers", difficulty: "focus", question: "Which statement about ABSOLUTE VALUE is true?", options: ["It includes the sign", "It's always negative", "It's the distance from zero", "It only applies to whole numbers"], correct: 2, explanation: "ABSOLUTE VALUE = DISTANCE from zero. Always POSITIVE!", source: "Tri 1 Final" },
+      { id: "m29", category: "Integers", difficulty: "medium", question: "What are OPPOSITES?", options: ["Both positive numbers", "Same distance from 0, opposite sides", "Multiply to equal 1", "Add to equal 1"], correct: 1, explanation: "OPPOSITES = same distance from 0, different sides. Example: 5 and -5!", source: "Tri 1 Final" },
+      { id: "m30", category: "Order of Operations", difficulty: "focus", question: "First step in: (12.9 - 3.1) × 6.2 - 2 + 4³?", options: ["Multiply 3.1 and 6.2", "Add 2 and 4³", "Subtract 3.1 from 12.9", "Subtract 2 from 6.2"], correct: 2, explanation: "PEMDAS! Parentheses first!", source: "Tri 1 Final" },
+      { id: "m31", category: "Order of Operations", difficulty: "medium", question: "What is the LCM of 3 and 7?", options: ["21", "3", "28", "1"], correct: 0, explanation: "3: 3,6,9,12,15,18,21... 7: 7,14,21... First common = 21!", source: "Tri 1 Final" },
+      { id: "m32", category: "Word Problems", difficulty: "hard", question: "Cherries: $4.35/lb, onions: $0.98/lb. $21.45 budget, buy 3 lbs onions. How many lbs cherries?", options: ["4 lbs", "4.5 lbs", "4.75 lbs", "4.25 lbs"], correct: 3, explanation: "Onions: 3×$0.98=$2.94. Left: $18.51. Cherries: $18.51÷$4.35=4.25 lbs!", source: "Tri 1 Final" },
+      { id: "m33", category: "Word Problems", difficulty: "medium", question: "F = ⁹⁄₅ × C + 32. What is 35°C in Fahrenheit?", options: ["95°F", "63°F", "39°F", "103°F"], correct: 0, explanation: "F = ⁹⁄₅ × 35 + 32 = 63 + 32 = 95°F!", source: "Tri 1 Final" },
+      { id: "m34", category: "Word Problems", difficulty: "hard", question: "300 mL fills a beaker to 15%. How much does it hold?", options: ["45 mL", "315 mL", "2000 mL", "450 mL"], correct: 2, explanation: "15% = 300 mL. 100% = 300 ÷ 0.15 = 2000 mL!", source: "Mid-Topic 6" },
+      { id: "m35", category: "Vocabulary", difficulty: "focus", question: "A ratio that compares to 100 is a ___.", options: ["Fraction", "Decimal", "Percent", "Rate"], correct: 2, explanation: "PERCENT = 'per 100'!", source: "Topic 6 Review" },
+    ];
+
+    const HeartIcon = ({ filled }) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill={filled ? "#ec4899" : "none"} stroke="#ec4899" strokeWidth="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    );
+
+    const historyCategories = [
+      { name: "Focus Areas", color: "bg-gradient-to-r from-red-500 to-pink-500", filter: q => q.difficulty === "focus" },
+      { name: "Government Types", color: "bg-gradient-to-r from-blue-500 to-blue-600", filter: q => q.category === "Government Types" },
+      { name: "Imperialism & Isolationism", color: "bg-gradient-to-r from-purple-500 to-purple-600", filter: q => q.category === "Imperialism & Isolationism" },
+      { name: "3 G's of Exploration", color: "bg-gradient-to-r from-yellow-500 to-orange-500", filter: q => q.category === "3 G's of Exploration" },
+      { name: "Civilizations", color: "bg-gradient-to-r from-green-500 to-green-600", filter: q => q.category === "Civilizations" },
+      { name: "Sources", color: "bg-gradient-to-r from-orange-500 to-red-500", filter: q => q.category === "Sources" },
+      { name: "Medieval Europe", color: "bg-gradient-to-r from-indigo-500 to-indigo-600", filter: q => q.category === "Medieval Europe" },
+      { name: "All Questions", color: "bg-gradient-to-r from-gray-600 to-gray-700", filter: () => true }
+    ];
+
+    const mathCategories = [
+      { name: "Focus Areas", color: "bg-gradient-to-r from-red-500 to-pink-500", filter: q => q.difficulty === "focus" },
+      { name: "Percents", color: "bg-gradient-to-r from-purple-500 to-indigo-500", filter: q => q.category === "Percents" },
+      { name: "Fractions", color: "bg-gradient-to-r from-blue-500 to-cyan-500", filter: q => q.category === "Fractions" },
+      { name: "Decimals", color: "bg-gradient-to-r from-green-500 to-emerald-500", filter: q => q.category === "Decimals" },
+      { name: "Expressions", color: "bg-gradient-to-r from-yellow-500 to-orange-500", filter: q => q.category === "Expressions" },
+      { name: "Coordinate Plane", color: "bg-gradient-to-r from-teal-500 to-green-500", filter: q => q.category === "Coordinate Plane" },
+      { name: "Integers", color: "bg-gradient-to-r from-rose-500 to-red-500", filter: q => q.category === "Integers" },
+      { name: "Word Problems", color: "bg-gradient-to-r from-violet-500 to-purple-500", filter: q => q.category === "Word Problems" },
+      { name: "All Questions", color: "bg-gradient-to-r from-gray-600 to-gray-700", filter: () => true }
+    ];
+
+    function App() {
+      const [screen, setScreen] = useState('welcome');
+      const [subject, setSubject] = useState(null);
+      const [currentCategory, setCurrentCategory] = useState(null);
+      const [questions, setQuestions] = useState([]);
+      const [currentQuestion, setCurrentQuestion] = useState(0);
+      const [selectedAnswer, setSelectedAnswer] = useState(null);
+      const [showFeedback, setShowFeedback] = useState(false);
+      const [hearts, setHearts] = useState(5);
+      const [xp, setXp] = useState(0);
+      const [streak, setStreak] = useState(0);
+      const [correctAnswers, setCorrectAnswers] = useState(0);
+      const [totalAnswered, setTotalAnswered] = useState(0);
+      const [showCorrectAnimation, setShowCorrectAnimation] = useState(false);
+
+      const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
+      const getDB = () => subject === 'history' ? historyQuestionDatabase : mathQuestionDatabase;
+      const getCats = () => subject === 'history' ? historyCategories : mathCategories;
+
+      const startLesson = (catName) => {
+        const cat = getCats().find(c => c.name === catName);
+        const filtered = getDB().filter(cat.filter);
+        setQuestions(shuffleArray(filtered).slice(0, 10));
+        setCurrentCategory(catName);
+        setCurrentQuestion(0);
+        setSelectedAnswer(null);
+        setShowFeedback(false);
+        setHearts(5);
+        setStreak(0);
+        setCorrectAnswers(0);
+        setScreen('quiz');
+      };
+
+      const checkAnswer = () => {
+        if (selectedAnswer === null) return;
+        setShowFeedback(true);
+        setTotalAnswered(p => p + 1);
+        if (selectedAnswer === questions[currentQuestion].correct) {
+          setCorrectAnswers(p => p + 1);
+          setXp(p => p + 10);
+          setStreak(p => p + 1);
+          setShowCorrectAnimation(true);
+          setTimeout(() => setShowCorrectAnimation(false), 1000);
+        } else {
+          setHearts(p => p - 1);
+          setStreak(0);
+        }
+      };
+
+      const nextQuestion = () => {
+        if (currentQuestion >= questions.length - 1 || hearts === 0) setScreen('results');
+        else { setCurrentQuestion(p => p + 1); setSelectedAnswer(null); setShowFeedback(false); }
+      };
+
+      const getCatCount = (filter) => getDB().filter(filter).length;
+
+      if (screen === 'welcome') {
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 text-white">
+            <div className="text-6xl mb-4">🎓</div>
+            <h1 className="text-3xl font-bold mb-2">Hayley's Tutor</h1>
+            <p className="text-slate-400 mb-6 text-center">History • Math • From Your Actual Coursework!</p>
+            <div className="bg-white/10 rounded-2xl p-5 mb-6 w-full max-w-xs">
+              <p className="text-center text-lg">Welcome back, <span className="font-bold text-yellow-300">Hayley!</span></p>
+              <p className="text-center text-slate-400 text-sm mt-2">65+ questions from your BASIS DC tests!</p>
+            </div>
+            <button onClick={() => setScreen('subjects')} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-3 px-10 rounded-2xl text-lg shadow-lg active:scale-95 transition-transform">
+              START LEARNING
+            </button>
+            <p className="mt-6 text-slate-500 text-xs">JMCBTech Educational Services</p>
+          </div>
+        );
+      }
+
+      if (screen === 'subjects') {
+        return (
+          <div className="min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 p-4">
+            <div className="max-w-md mx-auto">
+              <div className="text-center mb-6">
+                <h1 className="text-2xl font-bold text-white">🎓 Choose Your Subject</h1>
+                <div className="flex justify-center gap-6 mt-3 text-white text-sm">
+                  <span>❤️ {hearts}</span><span>⭐ {xp} XP</span><span>🔥 {streak}</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <button onClick={() => { setSubject('history'); setScreen('lessons'); }} className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl p-5 shadow-xl text-left active:scale-98 transition-transform">
+                  <div className="flex items-center gap-4">
+                    <span className="text-4xl">🏛️</span>
+                    <div>
+                      <h3 className="font-bold text-xl">World History</h3>
+                      <p className="text-blue-200 text-sm">Aztecs • Incas • Medieval Europe</p>
+                      <p className="text-blue-300 text-xs mt-1">{historyQuestionDatabase.length} questions</p>
+                    </div>
+                  </div>
+                </button>
+                <button onClick={() => { setSubject('math'); setScreen('lessons'); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-700 text-white rounded-2xl p-5 shadow-xl text-left active:scale-98 transition-transform">
+                  <div className="flex items-center gap-4">
+                    <span className="text-4xl">🧮</span>
+                    <div>
+                      <h3 className="font-bold text-xl">Math</h3>
+                      <p className="text-indigo-200 text-sm">Percents • Fractions • Expressions</p>
+                      <p className="text-indigo-300 text-xs mt-1">{mathQuestionDatabase.length} questions</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+              <div className="mt-6 p-3 bg-yellow-500/20 rounded-xl">
+                <p className="text-yellow-200 text-sm text-center">💡 Start with "Focus Areas" - concepts you need to master!</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'lessons') {
+        const cats = getCats();
+        const isH = subject === 'history';
+        return (
+          <div className={`min-h-screen bg-gradient-to-b ${isH ? 'from-blue-600 to-blue-800' : 'from-indigo-600 to-purple-700'} p-4`}>
+            <div className="max-w-md mx-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <button onClick={() => setScreen('subjects')} className="text-white/70 hover:text-white text-xl">←</button>
+                <h1 className="text-xl font-bold text-white">{isH ? '🏛️ History' : '🧮 Math'}</h1>
+              </div>
+              <div className="bg-white rounded-2xl p-3 mb-4 shadow-xl">
+                <h2 className="font-bold text-gray-800">Choose a Topic</h2>
+              </div>
+              <div className="space-y-2">
+                {cats.map((cat, i) => (
+                  <button key={i} onClick={() => startLesson(cat.name)} className={`w-full ${cat.color} text-white rounded-xl p-3 shadow-lg flex items-center active:scale-98 transition-transform`}>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-bold">{cat.name}</h3>
+                    </div>
+                    <div className="bg-white/20 rounded-full px-2 py-1 text-xs font-bold">{getCatCount(cat.filter)}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'quiz') {
+        const q = questions[currentQuestion];
+        const prog = (currentQuestion / questions.length) * 100;
+        const isH = subject === 'history';
+        return (
+          <div className="min-h-screen bg-gray-100 flex flex-col">
+            {showCorrectAnimation && <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"><div className="text-7xl animate-bounce">🎉</div></div>}
+            <div className="bg-white p-3 shadow-sm">
+              <div className="max-w-md mx-auto">
+                <div className="h-3 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                  <div className={`h-full ${isH ? 'bg-blue-500' : 'bg-purple-500'} rounded-full transition-all duration-300`} style={{ width: `${prog}%` }} />
+                </div>
+                <div className="flex justify-between items-center">
+                  <button onClick={() => setScreen('lessons')} className="text-gray-400 text-xl">✕</button>
+                  <div className="flex gap-1">{[...Array(5)].map((_, i) => <HeartIcon key={i} filled={i < hearts} />)}</div>
+                  <span className="text-yellow-500 font-bold">⚡{streak}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 p-3 overflow-y-auto">
+              <div className="max-w-md mx-auto">
+                <div className="bg-white rounded-xl p-4 shadow-lg mb-3">
+                  <div className="flex justify-between text-xs mb-2">
+                    <span className={`${isH ? 'text-blue-600 bg-blue-50' : 'text-purple-600 bg-purple-50'} px-2 py-1 rounded font-medium`}>{q.category}</span>
+                    <span className="text-gray-400">{q.source}</span>
+                  </div>
+                  <h2 className="font-bold text-gray-800 leading-relaxed">{q.question}</h2>
+                </div>
+                <div className="space-y-2">
+                  {q.options.map((opt, i) => (
+                    <button key={i} onClick={() => !showFeedback && setSelectedAnswer(i)} disabled={showFeedback}
+                      className={`w-full p-3 rounded-xl text-left font-medium transition-all flex items-center gap-3 active:scale-98 ${
+                        showFeedback ? (i === q.correct ? 'border-2 border-green-500 bg-green-100' : i === selectedAnswer ? 'border-2 border-red-500 bg-red-100' : 'border border-gray-200 bg-gray-50 opacity-50')
+                        : selectedAnswer === i ? `border-2 ${isH ? 'border-blue-500 bg-blue-50' : 'border-purple-500 bg-purple-50'}` : 'border border-gray-200 bg-white'
+                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                        showFeedback && i === q.correct ? 'bg-green-500 text-white' :
+                        showFeedback && i === selectedAnswer ? 'bg-red-500 text-white' :
+                        selectedAnswer === i ? `${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white` : 'bg-gray-200'
+                      }`}>{String.fromCharCode(65 + i)}</div>
+                      <span className="flex-1 text-sm">{opt}</span>
+                      {showFeedback && i === q.correct && <span className="text-green-600">✓</span>}
+                      {showFeedback && i === selectedAnswer && i !== q.correct && <span className="text-red-600">✗</span>}
+                    </button>
+                  ))}
+                </div>
+                {showFeedback && (
+                  <div className={`mt-3 p-3 rounded-xl ${selectedAnswer === q.correct ? 'bg-green-100 border border-green-400' : 'bg-red-100 border border-red-400'}`}>
+                    <p className="font-bold text-sm mb-1">{selectedAnswer === q.correct ? '🎉 Correct! +10 XP' : '❌ Not quite!'}</p>
+                    <p className="text-gray-700 text-sm">{q.explanation}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-3 bg-white border-t">
+              <div className="max-w-md mx-auto">
+                {!showFeedback ? (
+                  <button onClick={checkAnswer} disabled={selectedAnswer === null}
+                    className={`w-full py-3 rounded-xl font-bold transition-all active:scale-98 ${selectedAnswer !== null ? `${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white` : 'bg-gray-200 text-gray-400'}`}>
+                    CHECK ANSWER
+                  </button>
+                ) : (
+                  <button onClick={nextQuestion} className={`w-full py-3 rounded-xl font-bold ${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white active:scale-98 transition-transform`}>
+                    {currentQuestion >= questions.length - 1 || hearts === 0 ? 'SEE RESULTS' : 'CONTINUE →'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (screen === 'results') {
+        const pct = Math.round((correctAnswers / questions.length) * 100);
+        const isH = subject === 'history';
+        return (
+          <div className={`min-h-screen bg-gradient-to-b ${isH ? 'from-blue-600 to-blue-800' : 'from-indigo-600 to-purple-800'} flex flex-col items-center justify-center p-4 text-white`}>
+            <div className="text-6xl mb-3">{pct >= 90 ? '🏆' : pct >= 70 ? '⭐' : pct >= 50 ? '💪' : '📚'}</div>
+            <h1 className="text-2xl font-bold mb-1">{pct >= 90 ? 'Amazing!' : pct >= 70 ? 'Great Job!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!'}</h1>
+            <div className="text-5xl font-bold mb-1">{pct}%</div>
+            <p className="text-white/70 mb-4">{correctAnswers} of {questions.length} correct</p>
+            <div className="bg-white/20 rounded-xl p-4 mb-6 w-full max-w-xs">
+              <div className="flex justify-around text-center">
+                <div><div className="text-2xl font-bold">{xp}</div><div className="text-xs text-white/70">Total XP</div></div>
+                <div><div className="text-2xl font-bold">{streak}</div><div className="text-xs text-white/70">Best Streak</div></div>
+              </div>
+            </div>
+            <div className="flex gap-3 flex-wrap justify-center">
+              <button onClick={() => startLesson(currentCategory)} className="bg-white/20 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">🔄 Try Again</button>
+              <button onClick={() => setScreen('lessons')} className="bg-white/20 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">{isH ? '🏛️' : '🧮'} Topics</button>
+              <button onClick={() => setScreen('subjects')} className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">🎓 Switch</button>
+            </div>
+          </div>
+        );
+      }
+      return null;
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
