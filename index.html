@@ -14,6 +14,8 @@
 *{-webkit-tap-highlight-color:transparent;margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Nunito',sans-serif;background:#f8fafc}
 .no-sb::-webkit-scrollbar{display:none}.no-sb{-ms-overflow-style:none;scrollbar-width:none}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.animate-spin{animation:spin 1s linear infinite}
 @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pl{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 .af{animation:fu .4s ease forwards}.ap{animation:pl 2s ease-in-out infinite}
@@ -154,33 +156,156 @@ const QB = {
   ]
 };
 
+
+
+// ── US States ──
+const STATES = [
+  {code:'AL',name:'Alabama',std:'AL Course of Study'},{code:'AK',name:'Alaska',std:'Alaska Standards'},
+  {code:'AZ',name:'Arizona',std:'Arizona Standards'},{code:'AR',name:'Arkansas',std:'AR Frameworks'},
+  {code:'CA',name:'California',std:'CA Common Core/NGSS'},{code:'CO',name:'Colorado',std:'CO Academic Standards'},
+  {code:'CT',name:'Connecticut',std:'CT Core Standards'},{code:'DE',name:'Delaware',std:'DE Standards'},
+  {code:'DC',name:'District of Columbia',std:'DC Common Core/NGSS'},{code:'FL',name:'Florida',std:'FL BEST Standards'},
+  {code:'GA',name:'Georgia',std:'GA Standards of Excellence'},{code:'HI',name:'Hawaii',std:'HI Common Core'},
+  {code:'ID',name:'Idaho',std:'ID Content Standards'},{code:'IL',name:'Illinois',std:'IL Learning Standards'},
+  {code:'IN',name:'Indiana',std:'IN Academic Standards'},{code:'IA',name:'Iowa',std:'Iowa Core'},
+  {code:'KS',name:'Kansas',std:'KS Standards'},{code:'KY',name:'Kentucky',std:'KY Academic Standards'},
+  {code:'LA',name:'Louisiana',std:'LA Student Standards'},{code:'ME',name:'Maine',std:'ME Learning Results'},
+  {code:'MD',name:'Maryland',std:'MD College & Career Ready Standards'},{code:'MA',name:'Massachusetts',std:'MA Curriculum Frameworks'},
+  {code:'MI',name:'Michigan',std:'MI Academic Standards'},{code:'MN',name:'Minnesota',std:'MN Academic Standards'},
+  {code:'MS',name:'Mississippi',std:'MS College & Career Ready'},{code:'MO',name:'Missouri',std:'MO Learning Standards'},
+  {code:'MT',name:'Montana',std:'MT Content Standards'},{code:'NE',name:'Nebraska',std:'NE Standards'},
+  {code:'NV',name:'Nevada',std:'NV Academic Standards'},{code:'NH',name:'New Hampshire',std:'NH Standards'},
+  {code:'NJ',name:'New Jersey',std:'NJ Student Learning Standards'},{code:'NM',name:'New Mexico',std:'NM Standards'},
+  {code:'NY',name:'New York',std:'NY Next Gen Standards'},{code:'NC',name:'North Carolina',std:'NC Standard Course of Study'},
+  {code:'ND',name:'North Dakota',std:'ND Content Standards'},{code:'OH',name:'Ohio',std:'OH Learning Standards'},
+  {code:'OK',name:'Oklahoma',std:'OK Academic Standards'},{code:'OR',name:'Oregon',std:'OR Standards'},
+  {code:'PA',name:'Pennsylvania',std:'PA Core Standards'},{code:'RI',name:'Rhode Island',std:'RI Core Standards'},
+  {code:'SC',name:'South Carolina',std:'SC Standards'},{code:'SD',name:'South Dakota',std:'SD Content Standards'},
+  {code:'TN',name:'Tennessee',std:'TN Academic Standards'},{code:'TX',name:'Texas',std:'TX TEKS'},
+  {code:'UT',name:'Utah',std:'UT Core Standards'},{code:'VT',name:'Vermont',std:'VT Standards'},
+  {code:'VA',name:'Virginia',std:'VA SOL'},{code:'WA',name:'Washington',std:'WA Learning Standards'},
+  {code:'WV',name:'West Virginia',std:'WV Standards'},{code:'WI',name:'Wisconsin',std:'WI Academic Standards'},
+  {code:'WY',name:'Wyoming',std:'WY Content Standards'},
+];
+
+// ── Grade-level config for UI adaptation ──
+const GRADE_CONFIG = {
+  prek: { label:'Pre-K', age:'3-5', uiSize:'xl', qCount:5, subjects:['math','english'], useAI:true },
+  k: { label:'Kindergarten', age:'5-6', uiSize:'xl', qCount:5, subjects:['math','english','science'], useAI:true },
+  '1st': { label:'1st Grade', age:'6-7', uiSize:'lg', qCount:6, subjects:['math','english','science'], useAI:true },
+  '2nd': { label:'2nd Grade', age:'7-8', uiSize:'lg', qCount:6, subjects:['math','english','science'], useAI:true },
+  '3rd': { label:'3rd Grade', age:'8-9', uiSize:'md', qCount:8, subjects:['math','english','science','history'], useAI:true },
+  '4th': { label:'4th Grade', age:'9-10', uiSize:'md', qCount:8, subjects:['math','english','science','history'], useAI:true },
+  '5th': { label:'5th Grade', age:'10-11', uiSize:'md', qCount:8, subjects:['math','english','science','history'], useAI:false },
+  '6th': { label:'6th Grade', age:'11-12', uiSize:'sm', qCount:8, subjects:['math','english','science','history'], useAI:true },
+  '7th': { label:'7th Grade', age:'12-13', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  '8th': { label:'8th Grade', age:'13-14', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  '9th': { label:'9th Grade', age:'14-15', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  '10th': { label:'10th Grade', age:'15-16', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  '11th': { label:'11th Grade', age:'16-17', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  '12th': { label:'12th Grade', age:'17-18', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+  college: { label:'College', age:'18+', uiSize:'sm', qCount:10, subjects:['math','english','science','history'], useAI:true },
+};
+
+// ── AI Question Generator (for grades without hardcoded banks) ──
+async function generateQuestions(subject, grade, state, count = 6) {
+  const stateObj = STATES.find(s => s.code === state) || { name: 'District of Columbia', std: 'DC Common Core/NGSS' };
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const subj = SUBJECTS.find(s => s.id === subject);
+  
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 2500,
+        system: 'You generate educational quiz questions. Return ONLY a valid JSON array. No markdown, no backticks, no preamble. Each object must have: {"id":"q1","q":"question","opts":["A","B","C","D"],"ans":0,"exp":"explanation","cat":"topic","bl":"remember|understand|apply|analyze","diff":1}. The ans field is 0-indexed.',
+        messages: [{ role: 'user', content: `Generate ${count} multiple-choice questions for a ${gc.label} student in ${stateObj.name} studying ${subj.name}.
+
+STATE STANDARDS: ${stateObj.std}
+GRADE: ${gc.label} (ages ${gc.age})
+
+PEDAGOGICAL REQUIREMENTS:
+- Age-appropriate vocabulary and complexity for ${gc.label}
+- Align to ${stateObj.std} standards for this grade level
+- Mix Bloom's Taxonomy levels: 2 remember, 2 understand, 1-2 apply/analyze
+- Difficulty should be calibrated to ${gc.label} level
+- Explanations should be encouraging and use language appropriate for ages ${gc.age}
+- Use real-world examples students this age would relate to
+${grade === 'prek' || grade === 'k' ? '- Keep questions very simple, use concrete objects and counting
+- Limit to 2-3 answer choices' : ''}
+${grade === 'college' ? '- College-level rigor: critical thinking, analysis, synthesis required
+- Reference established academic frameworks and theories' : ''}
+
+SUBJECT-SPECIFIC for ${subj.name}:
+${subject === 'math' && (grade === 'prek' || grade === 'k') ? 'Focus on: counting to 20, shapes, more/less, patterns, sorting' : ''}
+${subject === 'math' && ['1st','2nd'].includes(grade) ? 'Focus on: addition/subtraction within 100, place value, time, measurement, basic geometry' : ''}
+${subject === 'math' && ['3rd','4th'].includes(grade) ? 'Focus on: multiplication/division, fractions introduction, area/perimeter, data/graphs' : ''}
+${subject === 'math' && ['6th','7th','8th'].includes(grade) ? 'Focus on: ratios, proportions, expressions, equations, geometry, statistics, pre-algebra' : ''}
+${subject === 'math' && ['9th','10th'].includes(grade) ? 'Focus on: algebra I/II, linear equations, quadratics, systems of equations, geometry proofs' : ''}
+${subject === 'math' && ['11th','12th'].includes(grade) ? 'Focus on: pre-calculus, trigonometry, statistics, probability, SAT/ACT prep' : ''}
+${subject === 'math' && grade === 'college' ? 'Focus on: calculus, linear algebra, statistics, discrete math (match course level)' : ''}
+${subject === 'science' && ['prek','k','1st','2nd'].includes(grade) ? 'Focus on: weather, plants, animals, senses, seasons, living vs non-living' : ''}
+${subject === 'science' && ['3rd','4th'].includes(grade) ? 'Focus on: ecosystems, simple machines, states of matter, life cycles, earth science' : ''}
+${subject === 'science' && ['6th','7th','8th'].includes(grade) ? 'Focus on: cells, body systems, chemistry basics, physics intro, earth systems' : ''}
+${subject === 'science' && ['9th','10th'].includes(grade) ? 'Focus on: biology, chemistry, earth science (match state sequence)' : ''}
+${subject === 'science' && ['11th','12th'].includes(grade) ? 'Focus on: AP Biology, AP Chemistry, Physics, Environmental Science' : ''}
+${subject === 'history' && ['3rd','4th'].includes(grade) ? 'Focus on: community, state history, US symbols, map skills, citizenship' : ''}
+${subject === 'history' && ['5th','6th'].includes(grade) ? 'Focus on: US history, ancient civilizations, geography, government basics' : ''}
+${subject === 'history' && ['7th','8th'].includes(grade) ? 'Focus on: world history, US Constitution, Civil War, civics' : ''}
+${subject === 'history' && ['9th','10th'].includes(grade) ? 'Focus on: world history I/II, US government, economics' : ''}
+${subject === 'history' && ['11th','12th'].includes(grade) ? 'Focus on: AP US History, AP World, AP Government, economics, current events' : ''}
+${subject === 'english' && (grade === 'prek' || grade === 'k') ? 'Focus on: letter recognition, rhyming, sight words, story comprehension' : ''}
+${subject === 'english' && ['1st','2nd'].includes(grade) ? 'Focus on: phonics, reading fluency, simple sentences, story elements' : ''}
+${subject === 'english' && ['3rd','4th'].includes(grade) ? 'Focus on: reading comprehension, paragraph writing, grammar basics, vocabulary' : ''}
+${subject === 'english' && ['9th','10th'].includes(grade) ? 'Focus on: literary analysis, essay writing, rhetoric, research skills' : ''}
+${subject === 'english' && ['11th','12th'].includes(grade) ? 'Focus on: AP Literature, AP Language, argument writing, synthesis, SAT/ACT reading' : ''}
+${subject === 'english' && grade === 'college' ? 'Focus on: critical analysis, academic writing, rhetoric, research methodology' : ''}
+
+Return exactly ${count} questions.` }]
+      })
+    });
+    const d = await r.json();
+    const text = d.content?.map(c => c.text || '').join('') || '[]';
+    return JSON.parse(text.replace(/\`\`\`json|\`\`\`/g, '').trim());
+  } catch (err) {
+    console.error('Question generation failed:', err);
+    return [];
+  }
+}
+
 // ── Adaptive Difficulty Engine ──
 function getAdaptiveQuestions(subject, studentId, count = 8) {
   const all = QB[subject] || [];
   const sr = getSRQueue(studentId);
   const due = getDueQuestions(studentId);
   
-  // Priority 1: Due spaced-repetition questions (max 3)
   const dueQs = all.filter(q => due.includes(q.id)).slice(0, 3);
-  
-  // Priority 2: Questions they haven't seen yet
   const unseen = all.filter(q => !sr[q.id] && !dueQs.find(d => d.id === q.id));
+  const struggling = all.filter(q => { const e=sr[q.id]; return e && e.box<=2 && !dueQs.find(d=>d.id===q.id); });
   
-  // Priority 3: Questions they've struggled with (box 1-2)
-  const struggling = all.filter(q => {
-    const e = sr[q.id];
-    return e && e.box <= 2 && !dueQs.find(d => d.id === q.id);
-  });
-  
-  // Build question set: due first, then mix unseen + struggling, sorted by Bloom's level
-  let pool = [...dueQs];
-  const remaining = [...unseen, ...struggling].sort(() => Math.random() - 0.5);
-  pool = [...pool, ...remaining].slice(0, count);
-  
-  // Sort by difficulty for ZPD scaffolding (easy → hard)
-  pool.sort((a, b) => a.diff - b.diff);
-  
+  let pool = [...dueQs, ...unseen, ...struggling].sort(() => Math.random()-0.5).slice(0, count);
+  pool.sort((a,b) => a.diff - b.diff);
   return pool;
+}
+
+// Async version for AI-generated questions (non-5th grade)
+async function getAIQuestions(subject, grade, state, studentId, count = 8) {
+  // Check cache first
+  const cacheKey = `aiq_${subject}_${grade}_${state}`;
+  const cached = LS.get(cacheKey, null);
+  const cacheAge = LS.get(cacheKey + '_t', 0);
+  if (cached && cached.length > 0 && (Date.now() - cacheAge) < 3600000) {
+    return cached.sort(() => Math.random() - 0.5).slice(0, count);
+  }
+  
+  const qs = await generateQuestions(subject, grade, state, count + 4); // generate extra for variety
+  if (qs.length > 0) {
+    // Add IDs if missing
+    qs.forEach((q, i) => { if (!q.id) q.id = `ai_${subject}_${grade}_${Date.now()}_${i}`; });
+    LS.set(cacheKey, qs);
+    LS.set(cacheKey + '_t', Date.now());
+  }
+  return qs.slice(0, count);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -200,8 +325,8 @@ function App() {
   useEffect(() => LS.set('pin', parentPin), [parentPin]);
   useEffect(() => LS.set('docs', uploadedDocs), [uploadedDocs]);
 
-  const addStudent = (name, grade) => {
-    const s = { id: 'stu_' + Date.now(), name, grade: grade || '5th', created: new Date().toISOString() };
+  const addStudent = (name, grade, state) => {
+    const s = { id: 'stu_' + Date.now(), name, grade: grade || '5th', state: state || 'DC', created: new Date().toISOString() };
     setStudents(p => [...p, s]);
     return s;
   };
@@ -258,6 +383,7 @@ function Landing({ onStudent, onParent }) {
 function StuLogin({ students, addStudent, onSelect, onBack }) {
   const [name, setName] = useState('');
   const [grade, setGrade] = useState('5th');
+  const [usState, setUsState] = useState('DC');
   const [adding, setAdding] = useState(false);
 
   return (
@@ -280,12 +406,16 @@ function StuLogin({ students, addStudent, onSelect, onBack }) {
         ) : (
           <div className="bg-white p-4 rounded-2xl border border-blue-200 mt-2">
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="w-full p-3 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:border-blue-400 font-medium" autoFocus />
-            <select value={grade} onChange={e => setGrade(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 focus:outline-none focus:border-blue-400">
-              {['3rd','4th','5th','6th','7th','8th'].map(g => <option key={g} value={g}>{g} Grade</option>)}
+            <select value={grade} onChange={e => setGrade(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:border-blue-400 text-sm">
+              {[{v:'prek',l:'Pre-K'},{v:'k',l:'Kindergarten'},{v:'1st',l:'1st Grade'},{v:'2nd',l:'2nd Grade'},{v:'3rd',l:'3rd Grade'},{v:'4th',l:'4th Grade'},{v:'5th',l:'5th Grade'},{v:'6th',l:'6th Grade'},{v:'7th',l:'7th Grade'},{v:'8th',l:'8th Grade'},{v:'9th',l:'9th Grade (Freshman)'},{v:'10th',l:'10th Grade (Sophomore)'},{v:'11th',l:'11th Grade (Junior)'},{v:'12th',l:'12th Grade (Senior)'},{v:'college',l:'College / University'}].map(g => <option key={g.v} value={g.v}>{g.l}</option>)}
+            </select>
+            <select value={usState} onChange={e => setUsState(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 focus:outline-none focus:border-blue-400 text-sm">
+              <option value="">Select State</option>
+              {STATES.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
             </select>
             <div className="flex gap-2">
               <button onClick={() => setAdding(false)} className="flex-1 py-2 text-gray-400 font-semibold">Cancel</button>
-              <button onClick={() => { if(name.trim()){ const s=addStudent(name.trim(),grade); setName(''); setAdding(false); onSelect(s); }}} className="flex-1 py-2 bg-blue-500 text-white rounded-xl font-bold as95 transition-transform">Go! 🚀</button>
+              <button onClick={() => { if(name.trim()){ const s=addStudent(name.trim(),grade,usState); setName(''); setAdding(false); onSelect(s); }}} className="flex-1 py-2 bg-blue-500 text-white rounded-xl font-bold as95 transition-transform">Go! 🚀</button>
             </div>
           </div>
         )}
@@ -341,7 +471,7 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
         <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80&auto=format" alt="" className="w-full h-full object-cover"/><div className="absolute inset-0 bg-gradient-to-br from-blue-700/90 to-indigo-700/90"/></div>
         <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <div><p className="text-blue-200 text-xs">Welcome back</p><h1 className="text-2xl font-black text-white">{user.name} 👋</h1></div>
+          <div><p className="text-blue-200 text-xs">Welcome back</p><h1 className="text-2xl font-black text-white">{user.name} 👋</h1><p className="text-blue-200/60 text-[10px]">{(GRADE_CONFIG[user.grade]||{}).label} · {(STATES.find(s=>s.code===user.state)||{name:'DC'}).name}</p></div>
           <button onClick={onLogout} className="text-blue-200 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
         </div>
         <div className="grid grid-cols-3 gap-2">
@@ -369,7 +499,7 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
 
         <h2 className="text-base font-extrabold text-gray-900 mt-5 mb-3">Choose a Subject</h2>
         <div className="grid grid-cols-2 gap-3">
-          {SUBJECTS.map(s => (
+          {SUBJECTS.filter(s => (GRADE_CONFIG[user.grade]||GRADE_CONFIG['5th']).subjects.includes(s.id)).map(s => (
             <div key={s.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               <div className={`relative bg-gradient-to-r ${s.color} p-3.5 overflow-hidden`}>
                 <img src={s.img} alt={s.name} className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" />
@@ -410,8 +540,24 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
    MODULE 3: ADAPTIVE QUIZ ENGINE
    ══════════════════════════════════════════════════════════════ */
 function Quiz({ subject, studentId, onDone, onBack }) {
-  const [questions] = useState(() => getAdaptiveQuestions(subject, studentId, 8));
+  const student = LS.get('students', []).find(s => s.id === studentId) || {};
+  const grade = student.grade || '5th';
+  const state = student.state || 'DC';
+  const gc = GRADE_CONFIG[grade] || GRADE_CONFIG['5th'];
+  const useAI = gc.useAI && grade !== '5th'; // 5th grade has hardcoded bank
+  
+  const [questions, setQuestions] = useState(() => useAI ? [] : getAdaptiveQuestions(subject, studentId, gc.qCount));
+  const [loading, setLoading] = useState(useAI);
   const [cur, setCur] = useState(0);
+  
+  useEffect(() => {
+    if (useAI) {
+      getAIQuestions(subject, grade, state, studentId, gc.qCount).then(qs => {
+        setQuestions(qs.length > 0 ? qs : getAdaptiveQuestions(subject, studentId, gc.qCount));
+        setLoading(false);
+      });
+    }
+  }, []);
   const [sel, setSel] = useState(null);
   const [fb, setFb] = useState(false);
   const [correct, setCorrect] = useState(0);
@@ -420,6 +566,14 @@ function Quiz({ subject, studentId, onDone, onBack }) {
 
   const q = questions[cur];
   const subj = SUBJECTS.find(s => s.id === subject);
+  
+  if (loading) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
+      <div className="relative w-16 h-16 mb-4"><div className="absolute inset-0 border-4 border-gray-100 rounded-full"/><div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin"/></div>
+      <p className="text-gray-500 font-semibold text-sm">Generating {gc.label} {subj.name} questions...</p>
+      <p className="text-gray-400 text-xs mt-1">Aligned to {(STATES.find(s=>s.code===state)||{}).std||'state'} standards</p>
+    </div>
+  );
   if (!q) return <div className="min-h-screen flex items-center justify-center text-gray-400">No questions available yet.</div>;
 
   const check = () => {
@@ -882,7 +1036,7 @@ function ParDash({ students, sessions, addStudent, onLogout }) {
             <div key={s.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-3">
               <button onClick={() => setExpanded(open?null:s.id)} className="w-full p-4 flex items-center gap-4 text-left">
                 <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">{s.name[0].toUpperCase()}</div>
-                <div className="flex-1"><div className="font-bold text-gray-900 text-sm">{s.name}</div><div className="text-[10px] text-gray-400">{ss.length} sessions · {xp} XP · {mastered} mastered</div></div>
+                <div className="flex-1"><div className="font-bold text-gray-900 text-sm">{s.name}</div><div className="text-[10px] text-gray-400">{(GRADE_CONFIG[s.grade]||{label:s.grade}).label} · {(STATES.find(x=>x.code===s.state)||{name:''}).name} · {ss.length} sessions · {xp} XP</div></div>
                 <span className={`text-gray-400 transition-transform ${open?'rotate-90':''}`}>›</span>
               </button>
               {open && (
