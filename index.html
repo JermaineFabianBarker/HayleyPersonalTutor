@@ -69,10 +69,10 @@ const BLOOMS = ['remember', 'understand', 'apply', 'analyze'];
 
 // ── Subject Configuration ──
 const SUBJECTS = [
-  { id:'math', name:'Math', icon:'🧮', color:'from-blue-500 to-blue-600', bg:'bg-blue-50', tx:'text-blue-600', bd:'border-blue-200', mapRit: 208, mapPct: 44 },
-  { id:'history', name:'History', icon:'🏛️', color:'from-amber-500 to-amber-600', bg:'bg-amber-50', tx:'text-amber-600', bd:'border-amber-200', mapRit: null, mapPct: null },
-  { id:'science', name:'Science', icon:'🔬', color:'from-green-500 to-green-600', bg:'bg-green-50', tx:'text-green-600', bd:'border-green-200', mapRit: null, mapPct: null },
-  { id:'english', name:'English', icon:'📖', color:'from-purple-500 to-purple-600', bg:'bg-purple-50', tx:'text-purple-600', bd:'border-purple-200', mapRit: 215, mapPct: 71 },
+  { id:'math', name:'Math', icon:'🧮', color:'from-blue-500 to-blue-600', bg:'bg-blue-50', tx:'text-blue-600', bd:'border-blue-200', mapRit: 208, mapPct: 44, img:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80&auto=format' },
+  { id:'history', name:'History', icon:'🏛️', color:'from-amber-500 to-amber-600', bg:'bg-amber-50', tx:'text-amber-600', bd:'border-amber-200', mapRit: null, mapPct: null, img:'https://images.unsplash.com/photo-1461360228754-6e81c478b882?w=400&q=80&auto=format' },
+  { id:'science', name:'Science', icon:'🔬', color:'from-green-500 to-green-600', bg:'bg-green-50', tx:'text-green-600', bd:'border-green-200', mapRit: null, mapPct: null, img:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&q=80&auto=format' },
+  { id:'english', name:'English', icon:'📖', color:'from-purple-500 to-purple-600', bg:'bg-purple-50', tx:'text-purple-600', bd:'border-purple-200', mapRit: 215, mapPct: 71, img:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&q=80&auto=format' },
 ];
 
 // ── Question Bank (Bloom's tagged, difficulty calibrated) ──
@@ -233,25 +233,22 @@ function App() {
 /* ── Landing ── */
 function Landing({ onStudent, onParent }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.07]">
-        <div className="absolute top-16 left-8 text-8xl">🧮</div>
-        <div className="absolute top-32 right-16 text-7xl">🔬</div>
-        <div className="absolute bottom-32 left-16 text-6xl">📖</div>
-        <div className="absolute bottom-16 right-8 text-8xl">🏛️</div>
+    <div className="min-h-screen relative flex flex-col items-center justify-center p-6 overflow-hidden">
+      <div className="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&q=80&auto=format" alt="Students learning" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
       </div>
       <div className="relative z-10 text-center max-w-md w-full">
-        <div className="text-6xl mb-3">🚀</div>
-        <h1 className="text-4xl font-black text-white mb-1 tracking-tight">LeapIQ</h1>
-        <p className="text-blue-200/80 mb-2 text-sm font-semibold tracking-wide">ADAPTIVE AI LEARNING</p>
-        <p className="text-blue-300/50 mb-10 text-sm">Meets students where they are. Takes them where they need to go.</p>
-        <button onClick={onStudent} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold py-4 rounded-2xl mb-3 text-lg shadow-lg shadow-amber-500/25 as95 transition-transform">
-          🎓 I'm a Student
+        <h1 className="text-5xl font-black text-white mb-2 tracking-tight" style={{fontFamily:'Nunito'}}>LeapIQ</h1>
+        <p className="text-white/60 mb-2 text-xs font-bold tracking-[0.2em] uppercase">Adaptive AI Learning</p>
+        <p className="text-white/40 mb-10 text-sm">Meets students where they are. Takes them where they need to go.</p>
+        <button onClick={onStudent} className="w-full bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-4 rounded-2xl mb-3 text-lg shadow-xl as95 transition-all">
+          I'm a Student
         </button>
-        <button onClick={onParent} className="w-full bg-white/10 backdrop-blur text-white font-bold py-4 rounded-2xl border border-white/15 text-base as95 transition-transform">
-          👨‍👩‍👧 Parent Dashboard
+        <button onClick={onParent} className="w-full bg-white/10 backdrop-blur text-white font-bold py-4 rounded-2xl border border-white/20 text-base as95 transition-all hover:bg-white/20">
+          Parent Dashboard
         </button>
-        <p className="text-blue-400/30 text-[10px] mt-10 font-semibold tracking-wider">BUILT BY JMCB TECHNOLOGY GROUP</p>
+        <p className="text-white/20 text-[10px] mt-10 font-semibold tracking-wider">BUILT BY JMCB TECHNOLOGY GROUP</p>
       </div>
     </div>
   );
@@ -264,7 +261,10 @@ function StuLogin({ students, addStudent, onSelect, onBack }) {
   const [adding, setAdding] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
+    <div className="min-h-screen relative p-6">
+      <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200&q=80&auto=format" alt="" className="w-full h-full object-cover opacity-[0.06]"/></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/95 to-white/98"/>
+      <div className="relative z-10">
       <button onClick={onBack} className="text-gray-400 text-sm mb-6">&larr; Back</button>
       <div className="max-w-sm mx-auto">
         <h1 className="text-2xl font-black text-gray-900 mb-1">Welcome! 👋</h1>
@@ -289,6 +289,7 @@ function StuLogin({ students, addStudent, onSelect, onBack }) {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
@@ -336,7 +337,9 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 pt-6 pb-8 rounded-b-3xl">
+      <div className="relative px-5 pt-6 pb-8 rounded-b-3xl overflow-hidden">
+        <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80&auto=format" alt="" className="w-full h-full object-cover"/><div className="absolute inset-0 bg-gradient-to-br from-blue-700/90 to-indigo-700/90"/></div>
+        <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div><p className="text-blue-200 text-xs">Welcome back</p><h1 className="text-2xl font-black text-white">{user.name} 👋</h1></div>
           <button onClick={onLogout} className="text-blue-200 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
@@ -345,6 +348,7 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
           {[{v:totalXP,l:'Total XP'},{v:sessions.length,l:'Sessions'},{v:today,l:'Today'}].map(s => (
             <div key={s.l} className="bg-white/15 rounded-xl p-2.5 text-center"><div className="text-xl font-black text-white">{s.v}</div><div className="text-blue-200 text-[10px]">{s.l}</div></div>
           ))}
+        </div>
         </div>
       </div>
       <div className="px-5 -mt-3">
@@ -367,11 +371,12 @@ function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogo
         <div className="grid grid-cols-2 gap-3">
           {SUBJECTS.map(s => (
             <div key={s.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-              <div className={`bg-gradient-to-r ${s.color} p-3.5`}>
-                <div className="text-2xl mb-0.5">{s.icon}</div>
-                <div className="text-white font-extrabold">{s.name}</div>
-                {s.mapRit && <div className="text-white/60 text-[10px]">MAP: {s.mapRit} RIT ({s.mapPct}th %ile)</div>}
-                {subjStats[s.id].n > 0 && <div className="text-white/60 text-[10px]">{subjStats[s.id].acc}% accuracy</div>}
+              <div className={`relative bg-gradient-to-r ${s.color} p-3.5 overflow-hidden`}>
+                <img src={s.img} alt={s.name} className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" />
+                <div className="relative z-10 text-2xl mb-0.5">{s.icon}</div>
+                <div className="relative z-10 text-white font-extrabold">{s.name}</div>
+                {s.mapRit && <div className="relative z-10 text-white/60 text-[10px]">MAP: {s.mapRit} RIT ({s.mapPct}th %ile)</div>}
+                {subjStats[s.id].n > 0 && <div className="relative z-10 text-white/60 text-[10px]">{subjStats[s.id].acc}% accuracy</div>}
               </div>
               <div className="p-2.5 space-y-1.5">
                 <button onClick={() => onQuiz(s.id)} className={`w-full py-2 ${s.bg} ${s.tx} font-bold rounded-xl text-xs as95 transition-transform`}>📝 Quiz</button>
@@ -592,8 +597,10 @@ function ReviewMode({ studentId, onBack }) {
   const [score, setScore] = useState(0);
 
   if (questions.length === 0) return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
-      <div className="text-5xl mb-4">✅</div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=1200&q=80&auto=format" alt="" className="w-full h-full object-cover opacity-10"/></div>
+      <div className="absolute inset-0 bg-white/95"/>
+      <div className="relative z-10 text-5xl mb-4">✅</div>
       <h1 className="text-xl font-black text-gray-900 mb-2">All caught up!</h1>
       <p className="text-gray-500 text-sm mb-6">No questions due for review. Keep practicing to add more!</p>
       <button onClick={onBack} className="bg-blue-500 text-white font-bold py-3 px-8 rounded-xl as95 transition-transform">Back to Dashboard</button>
@@ -783,8 +790,9 @@ function GenQuizPractice({ questions, studentId, onBack }) {
   const [score, setScore] = useState(0);
 
   if (cur >= questions.length) return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-600 to-indigo-700 flex flex-col items-center justify-center p-6 text-white">
-      <div className="text-5xl mb-3">{score/questions.length>=0.8?'🏆':score/questions.length>=0.6?'⭐':'💪'}</div>
+    <div className="min-h-screen relative flex flex-col items-center justify-center p-6 text-white overflow-hidden">
+      <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1523050854058-8df90110c476?w=1200&q=80&auto=format" alt="" className="w-full h-full object-cover"/><div className="absolute inset-0 bg-gradient-to-b from-blue-700/85 to-indigo-800/90"/></div>
+      <div className="relative z-10 text-5xl mb-3">{score/questions.length>=0.8?'🏆':score/questions.length>=0.6?'⭐':'💪'}</div>
       <div className="text-4xl font-black mb-1">{Math.round(score/questions.length*100)}%</div>
       <p className="text-white/70 mb-6">{score} of {questions.length} correct</p>
       <button onClick={onBack} className="bg-white/20 text-white font-bold py-3 px-8 rounded-xl as95">Done</button>
@@ -843,12 +851,15 @@ function ParDash({ students, sessions, addStudent, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-5 pt-6 pb-8 rounded-b-3xl">
+      <div className="relative px-5 pt-6 pb-8 rounded-b-3xl overflow-hidden">
+        <div className="absolute inset-0"><img src="https://images.unsplash.com/photo-1484981138541-3d074aa97571?w=800&q=80&auto=format" alt="" className="w-full h-full object-cover"/><div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 to-slate-800/90"/></div>
+        <div className="relative z-10">
         <div className="flex items-center justify-between mb-2">
           <div><p className="text-slate-400 text-xs">Parent Dashboard</p><h1 className="text-2xl font-black text-white">LeapIQ 📊</h1></div>
           <button onClick={onLogout} className="text-slate-400 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
         </div>
         <p className="text-slate-400 text-xs">Track learning progress across all subjects.</p>
+        </div>
       </div>
       <div className="px-5 -mt-3">
         {students.map(s => {
