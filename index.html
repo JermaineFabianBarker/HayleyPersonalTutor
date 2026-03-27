@@ -1,370 +1,951 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Hayley's Tutor - JMCBTech</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
-  <style>
-    * { -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    .animate-bounce { animation: bounce 1s infinite; }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
-      50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>LeapIQ - Adaptive AI Learning</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+<style>
+*{-webkit-tap-highlight-color:transparent;margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:#f8fafc}
+.no-sb::-webkit-scrollbar{display:none}.no-sb{-ms-overflow-style:none;scrollbar-width:none}
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pl{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.af{animation:fu .4s ease forwards}.ap{animation:pl 2s ease-in-out infinite}
+.as95:active{transform:scale(.95)}.as98:active{transform:scale(.98)}
+</style>
+<script>tailwind.config={theme:{extend:{colors:{brand:{50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8'},acc:'#D97706'}}}}</script>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState } = React;
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
-    const historyQuestionDatabase = [
-      { id: "h1", category: "Government Types", difficulty: "focus", question: "\"The Sapa Inca is a god-like figure who also has control over the government.\" This quote describes which type of government?", options: ["Monarchy", "Democracy", "Theocracy", "Imperialism"], correct: 2, explanation: "THEOCRACY! Remember: THEO = GOD. The Sapa Inca was believed to be divine AND controlled the government.", source: "Week 4 Quiz" },
-      { id: "h2", category: "Government Types", difficulty: "focus", question: "What is the KEY difference between a Theocracy and a Monarchy?", options: ["Theocracy has voting, Monarchy doesn't", "In Theocracy the ruler is seen as a GOD; in Monarchy the ruler is just a king/queen", "Monarchy is older than Theocracy", "There is no difference"], correct: 1, explanation: "In a THEOCRACY, the ruler is believed to be divine (god-like). In a MONARCHY, the ruler is human royalty (king/queen).", source: "Focus Concept" },
-      { id: "h3", category: "Government Types", difficulty: "medium", question: "\"Divine principles guide the state's governance, with religious leaders exercising authority in both spiritual matters and political decisions.\" This describes which leader?", options: ["Aztec Emperor", "Clan Mother", "Conquistadors", "Sapa Inca"], correct: 3, explanation: "The Sapa Inca ruled as both a religious AND political leader - this is a THEOCRACY.", source: "Mastery Assessment" },
-      { id: "h4", category: "Government Types", difficulty: "medium", question: "Which of the following accurately defines theocracy?", options: ["Government with religious leaders", "Government with a woman leader", "Government with no leader", "None of the above"], correct: 0, explanation: "A THEOCRACY is a government where religious leaders (or god-like rulers) have control. THEO = GOD.", source: "Week 10 Quiz" },
-      { id: "h5", category: "Government Types", difficulty: "medium", question: "\"Some rulers believe their authority is granted by a higher power, making their decisions unquestionable.\" This describes:", options: ["Polytheism", "Divine Right of Kings", "Magna Carta", "Feudal System"], correct: 1, explanation: "DIVINE RIGHT OF KINGS = the belief that a king's power comes from God, so no one can question them.", source: "Mastery Assessment" },
-      { id: "h6", category: "Government Types", difficulty: "hard", question: "How is the Magna Carta different from the Divine Right of Kings?", options: ["The Magna Carta LIMITED the king's power, while Divine Right gave ABSOLUTE power", "The Magna Carta gave the king MORE power", "The Magna Carta established the king's right to rule by birth", "The Magna Carta supported the Divine Right of Kings"], correct: 0, explanation: "Magna Carta = LIMITS king's power. Divine Right = UNLIMITED power from God. They are OPPOSITES!", source: "Week 7 Quiz" },
-      { id: "h7", category: "Imperialism & Isolationism", difficulty: "focus", question: "\"The more we interact with foreign empires, the more divided we become. It is best we look inward and avoid their conflicts.\" This quote supports which policy?", options: ["Imperialism", "Nationalism", "Globalization", "Isolationism"], correct: 3, explanation: "ISOLATIONISM! Key words: 'look inward,' 'avoid.' Isolationism = staying OUT of other countries' business.", source: "Week 9 Quiz" },
-      { id: "h8", category: "Imperialism & Isolationism", difficulty: "focus", question: "\"Driven by the thirst for wealth and glory, we embarked on journeys to conquer new lands and expand our empire.\" This reflects:", options: ["Scientific curiosity", "Religious missionary zeal", "Economic gain and territorial expansion", "Cultural exchange"], correct: 2, explanation: "Key words: 'conquer,' 'expand,' 'empire' = IMPERIALISM (economic gain and territorial expansion).", source: "Week 19 Quiz" },
-      { id: "h9", category: "Imperialism & Isolationism", difficulty: "medium", question: "What is ISOLATIONISM?", options: ["A country taking over other lands", "A country avoiding involvement in other nations' affairs", "A country spreading its religion", "A country building an empire"], correct: 1, explanation: "ISOLATIONISM = ISOLATE = staying ALONE, avoiding other countries' business. The OPPOSITE of imperialism.", source: "Week 7 Quiz" },
-      { id: "h10", category: "Imperialism & Isolationism", difficulty: "medium", question: "What type of foreign policy was George Washington supporting when he said to 'trade with other countries but stay out of their politics'?", options: ["Imperialism", "Isolationism", "Nationalism", "Colonialism"], correct: 1, explanation: "George Washington supported ISOLATIONISM - trade with others, but don't get involved in their wars or politics.", source: "Week 6 Quiz" },
-      { id: "h11", category: "3 G's of Exploration", difficulty: "focus", question: "\"I and my companions suffer from a disease of the heart which can be cured only with gold.\" - Hernán Cortés. This quote represents which motive?", options: ["Raising awareness about heart disease", "One of the three motives for conquistador exploration", "Origins of heart support", "The conquistadors offering gold to the Aztecs"], correct: 1, explanation: "This shows the GOLD motive! Cortés was SEEKING gold, not giving it away. The 3 G's: Gold, God, Glory.", source: "Week 4 Quiz" },
-      { id: "h12", category: "3 G's of Exploration", difficulty: "medium", question: "\"Our desire with this newly discovered city, Tenochtitlan, is for all citizens to stop accepting polytheistic ways and follow our way of prayer.\" Which motive is expressed?", options: ["Glory", "God", "Gold", "None"], correct: 1, explanation: "GOD motive! Key words: 'stop polytheistic ways,' 'follow our way of prayer' = spreading Christianity.", source: "Week 7 Quiz" },
-      { id: "h13", category: "3 G's of Exploration", difficulty: "medium", question: "\"The jewels and diamonds have enticed our leaders to get greedier and greedier.\" Which motive is expressed?", options: ["Glory", "God", "Gold", "None"], correct: 2, explanation: "GOLD motive! Key words: 'jewels,' 'diamonds,' 'greedier' = wanting wealth and riches.", source: "Week 7 Quiz" },
-      { id: "h14", category: "3 G's of Exploration", difficulty: "easy", question: "What are the THREE reasons (3 G's) that conquistadors explored the Americas?", options: ["Guns, Germs, Steel", "Gold, God, Glory", "Greece, Germany, Gaul", "Government, Geography, Growth"], correct: 1, explanation: "The 3 G's: GOLD (wealth), GOD (spreading Christianity), GLORY (fame and power).", source: "Core Concept" },
-      { id: "h15", category: "3 G's of Exploration", difficulty: "medium", question: "Why is Hernán Cortés significant?", options: ["He drew the Codex Mendoza", "He saved the Aztec Empire", "He was leader of the conquistadors that conquered the Aztecs", "He wanted to give the Aztecs gold"], correct: 2, explanation: "Hernán Cortés LED the Spanish conquistadors who CONQUERED the AZTEC Empire.", source: "Week 4 Quiz" },
-      { id: "h16", category: "Civilizations", difficulty: "medium", question: "What is one SIMILARITY between the Aztecs and Incas?", options: ["They were both monotheistic", "They both conquered England", "They both put women in charge", "They both practiced human sacrifice"], correct: 3, explanation: "Both Aztecs and Incas practiced human sacrifice AND were polytheistic (believed in many gods).", source: "Mastery Assessment" },
-      { id: "h17", category: "Civilizations", difficulty: "focus", question: "Which statement about religion is TRUE?", options: ["All three groups are monotheistic", "Aztecs and Inca are monotheistic, Haudenosaunee is polytheistic", "Haudenosaunee is monotheistic, Aztec and Inca are polytheistic", "Francisco Pizarro conquered the Aztecs"], correct: 2, explanation: "Haudenosaunee = MONOTHEIST (ONE god). Aztec & Inca = POLYTHEIST (MANY gods). This is a KEY difference!", source: "Week 7 Quiz" },
-      { id: "h18", category: "Civilizations", difficulty: "medium", question: "Which civilization gave women the MOST power?", options: ["Haudenosaunee", "Inca", "Aztec", "None gave women power"], correct: 0, explanation: "HAUDENOSAUNEE! Clan Mothers had real power - they chose the leaders.", source: "Week 10 Quiz" },
-      { id: "h19", category: "Civilizations", difficulty: "medium", question: "The Aztecs used floating gardens called:", options: ["Terraces", "Quipus", "Three Sisters", "Chinampas"], correct: 3, explanation: "CHINAMPAS = Aztec floating gardens! Quipus = Inca. Three Sisters = Haudenosaunee.", source: "Mastery Assessment" },
-      { id: "h20", category: "Civilizations", difficulty: "medium", question: "What is the practice of 'Three Sisters' farming?", options: ["Cultivating three types of fruits", "Rotating crops through fields", "Growing corn, beans, and squash together", "Using three irrigation methods"], correct: 2, explanation: "Three Sisters = corn, beans, and squash grown together. This was a HAUDENOSAUNEE practice.", source: "Week 10 Quiz" },
-      { id: "h21", category: "Civilizations", difficulty: "medium", question: "\"Though they had no writing system, this group recorded through an intricate series of knots and cords.\" Which group?", options: ["Haudenosaunee", "Aztecs", "Inca", "Europeans"], correct: 2, explanation: "INCA used QUIPUS (knotted cords) for record-keeping. Aztecs used GLYPHS.", source: "Week 9 Quiz" },
-      { id: "h22", category: "Civilizations", difficulty: "easy", question: "Who conquered the Aztec Empire?", options: ["Francisco Pizarro", "Hernán Cortés", "The Sapa Inca", "The King of Spain"], correct: 1, explanation: "HERNÁN CORTÉS conquered the AZTECS. FRANCISCO PIZARRO conquered the INCAS. Don't mix them up!", source: "Week 10 Quiz" },
-      { id: "h23", category: "Civilizations", difficulty: "medium", question: "The Great Law of Peace was created by which group?", options: ["Inca", "Aztecs", "Conquistadors", "Haudenosaunee"], correct: 3, explanation: "The HAUDENOSAUNEE (Iroquois) created the Great Law of Peace to unite their nations.", source: "Week 6 Quiz" },
-      { id: "h24", category: "Sources", difficulty: "easy", question: "Your World History textbook or an encyclopedia is a:", options: ["Primary Source", "Secondary Source", "Not a source", "Both A and B"], correct: 1, explanation: "SECONDARY SOURCE! It was written AFTER the events to EXPLAIN history.", source: "Week 4 Quiz" },
-      { id: "h25", category: "Sources", difficulty: "focus", question: "The Aztecs used picture-symbols to record information. These are called:", options: ["Pictures", "Sketches", "Glyphs", "None of the above"], correct: 2, explanation: "GLYPHS! Aztec glyphs are symbols/pictures with meaning - used instead of letters.", source: "Week 4 Quiz" },
-      { id: "h26", category: "Medieval Europe", difficulty: "medium", question: "In the Feudal System, which group is responsible for PROTECTION?", options: ["King", "Nobles", "Vassals/Knights", "Peasants"], correct: 2, explanation: "VASSALS/KNIGHTS provided protection in exchange for land.", source: "Mastery Assessment" },
-      { id: "h27", category: "Medieval Europe", difficulty: "medium", question: "\"This hero led troops into battle during the Hundred Years' War and claimed divine visions.\" Who is this?", options: ["King of England", "Joan of Arc", "Clan Mother", "Queen Elizabeth I"], correct: 1, explanation: "JOAN OF ARC! She led French soldiers to victory during the Hundred Years' War.", source: "Week 9 Quiz" },
-      { id: "h28", category: "Medieval Europe", difficulty: "medium", question: "What was the main goal of the Crusades for European Christians?", options: ["To explore new lands", "To protect from Vikings", "To reclaim the Holy Land from Muslim control", "To establish kingdoms in Africa"], correct: 2, explanation: "The Crusades = Christian Europeans trying to reclaim the Holy Land (Jerusalem).", source: "Mastery Assessment" },
-      { id: "h29", category: "Medieval Europe", difficulty: "medium", question: "What was the primary cause of the Black Death spreading?", options: ["Contaminated water", "The Hundred Years' War", "Flea-infested rats carrying bacteria", "Contaminated food"], correct: 2, explanation: "RATS with FLEAS spread the Black Death (bubonic plague).", source: "Week 10 Quiz" },
-      { id: "h30", category: "Civilizations", difficulty: "easy", question: "Social Hierarchy is defined as:", options: ["A theocracy", "The ranking of people by power and status", "Polytheism", "Gold"], correct: 1, explanation: "SOCIAL HIERARCHY = ranking people from most powerful to least powerful.", source: "Mastery Assessment" },
-    ];
+/* ══════════════════════════════════════════════════════════════
+   MODULE 0: DATA LAYER - Persistence, Question Bank, Student Profiles
+   ══════════════════════════════════════════════════════════════ */
+const LS={
+  get(k,fb){try{const d=localStorage.getItem('liq_'+k);return d?JSON.parse(d):fb}catch{return fb}},
+  set(k,v){try{localStorage.setItem('liq_'+k,JSON.stringify(v))}catch{}},
+  del(k){try{localStorage.removeItem('liq_'+k)}catch{}}
+};
 
-    const mathQuestionDatabase = [
-      { id: "m1", category: "Percents", difficulty: "focus", question: "What is the meaning of percent?", options: ["A ratio to 10", "A ratio to 100", "A ratio to 1000", "Any fraction"], correct: 1, explanation: "PERCENT means 'per hundred' or 'out of 100.' So 45% means 45 out of 100!", source: "Topic 6 Review" },
-      { id: "m2", category: "Percents", difficulty: "focus", question: "Write 35% as a fraction in simplest form.", options: ["35/10", "7/20", "3/5", "1/35"], correct: 1, explanation: "35% = 35/100. Simplify: 35÷5=7 and 100÷5=20. So 35% = 7/20!", source: "Topic 6 Review" },
-      { id: "m3", category: "Percents", difficulty: "medium", question: "Write 35% as a decimal.", options: ["3.5", "0.35", "35.0", "0.035"], correct: 1, explanation: "To convert percent to decimal, DIVIDE BY 100. 35% = 0.35", source: "Topic 6 Review" },
-      { id: "m4", category: "Percents", difficulty: "medium", question: "A player made 17 out of 20 free throws. What percent did they MISS?", options: ["85%", "17%", "15%", "3%"], correct: 2, explanation: "Made 17 means MISSED 3. 3/20 = 15/100 = 15% missed!", source: "Mid-Topic 6" },
-      { id: "m5", category: "Percents", difficulty: "hard", question: "Write 221% as a decimal.", options: ["2.21", "22.1", "0.221", "221.0"], correct: 0, explanation: "221% ÷ 100 = 2.21. Percents over 100% become decimals greater than 1!", source: "Lesson 6-3" },
-      { id: "m6", category: "Percents", difficulty: "medium", question: "Estimate 24% of 83.", options: ["About 8", "About 20", "About 24", "About 83"], correct: 1, explanation: "24% ≈ 25% = ¼. Round 83 to 80. ¼ × 80 = 20!", source: "Lesson 6-4" },
-      { id: "m7", category: "Percents", difficulty: "focus", question: "The Murphy family traveled 30% on day 1 and ¼ on day 2. What PERCENT is left?", options: ["45%", "55%", "25%", "70%"], correct: 0, explanation: "Day 1: 30%. Day 2: ¼ = 25%. Total: 55%. Left: 100% - 55% = 45%!", source: "Mid-Topic 6" },
-      { id: "m8", category: "Percents", difficulty: "hard", question: "80% of what number is 96?", options: ["76.8", "120", "116", "96"], correct: 1, explanation: "0.80 × n = 96. Divide: n = 96 ÷ 0.8 = 120.", source: "Lesson 6-6" },
-      { id: "m9", category: "Percents", difficulty: "hard", question: "What is 16% of 73.5?", options: ["11.76", "4.59", "117.6", "1.176"], correct: 0, explanation: "0.16 × 73.5 = 11.76", source: "Lesson 6-5" },
-      { id: "m10", category: "Fractions", difficulty: "focus", question: "Find the difference: 8¼ - 3⅚", options: ["5⁵⁄₁₂", "4³⁄₄", "4⁵⁄₁₂", "5¹⁄₁₂"], correct: 2, explanation: "Convert to improper, find LCM=12, subtract: 99/12 - 46/12 = 53/12 = 4⁵⁄₁₂", source: "Tri 1 Final" },
-      { id: "m11", category: "Fractions", difficulty: "focus", question: "Which of these is an IMPROPER fraction?", options: ["3⅓", "11/4", "6.75", "12/12"], correct: 1, explanation: "IMPROPER = numerator LARGER than denominator. 11/4 has 11 > 4!", source: "Tri 1 Final" },
-      { id: "m12", category: "Fractions", difficulty: "medium", question: "Recipe calls for 1¾ cups flour. If you TRIPLE it, how much flour?", options: ["3⁹⁄₁₂ cups", "4¼ cups", "3¾ cups", "5¼ cups"], correct: 3, explanation: "7/4 × 3 = 21/4 = 5¼ cups!", source: "Tri 1 Final" },
-      { id: "m13", category: "Fractions", difficulty: "medium", question: "Recipe calls for ⅔ cup sugar. For 6 batches, how much sugar?", options: ["⅔ cup", "2/18 cup", "4 cups", "3 cups"], correct: 2, explanation: "⅔ × 6 = 12/3 = 4 cups!", source: "Tri 1 Final" },
-      { id: "m14", category: "Fractions", difficulty: "hard", question: "Baker has 2½ cups sprinkles. Each cupcake needs ⅙ cup. How many cupcakes?", options: ["14", "10", "30", "15"], correct: 3, explanation: "5/2 ÷ 1/6 = 5/2 × 6/1 = 30/2 = 15 cupcakes!", source: "Tri 1 Final" },
-      { id: "m15", category: "Fractions", difficulty: "focus", question: "The INVERSE of a fraction is called its:", options: ["Quotient", "Flip", "Reciprocal", "Product"], correct: 2, explanation: "RECIPROCAL = flip numerator and denominator!", source: "Tri 1 Final" },
-      { id: "m16", category: "Fractions", difficulty: "medium", question: "5/6 × 2/9 = ?", options: ["5/27", "7/15", "3/3", "10/15"], correct: 0, explanation: "5×2=10, 6×9=54. Simplify: 10/54 = 5/27", source: "Unit 1 Review" },
-      { id: "m17", category: "Fractions", difficulty: "medium", question: "4/5 ÷ 2/3 = ?", options: ["8/15", "6/5 = 1⅕", "2/5", "12/10"], correct: 1, explanation: "Keep-Change-Flip! 4/5 × 3/2 = 12/10 = 6/5 = 1⅕", source: "Unit 1 Review" },
-      { id: "m18", category: "Decimals", difficulty: "focus", question: "Tricia has $37.25. She writes a check for $23.99. How much is left?", options: ["$12.36", "$12.74", "$13.26", "$13.74"], correct: 2, explanation: "$37.25 - $23.99 = $13.26", source: "Tri 1 Final" },
-      { id: "m19", category: "Decimals", difficulty: "medium", question: "45.67 + 3.45 = ?", options: ["49.12", "48.12", "49.02", "80.17"], correct: 0, explanation: "Line up decimals! 45.67 + 3.45 = 49.12", source: "Unit 1 Review" },
-      { id: "m20", category: "Decimals", difficulty: "hard", question: "96.48 ÷ 0.12 = ?", options: ["8.04", "80.4", "804", "8040"], correct: 2, explanation: "Move decimal 2 places: 9648 ÷ 12 = 804", source: "Unit 1 Review" },
-      { id: "m21", category: "Decimals", difficulty: "medium", question: "What is 285 ÷ 15?", options: ["17", "28", "19", "21"], correct: 2, explanation: "15 × 19 = 285. Answer is 19!", source: "Tri 1 Final" },
-      { id: "m22", category: "Expressions", difficulty: "focus", question: "Which expression equals 2(6y - 4)?", options: ["8y - 2", "4(3y - 2)", "12(y - 1)", "12y - 8"], correct: 3, explanation: "DISTRIBUTIVE PROPERTY! 2×6y - 2×4 = 12y - 8", source: "Tri 1 Final" },
-      { id: "m23", category: "Expressions", difficulty: "focus", question: "Phone plan: $75/month + $0.17/minute. If x = minutes, which shows monthly cost?", options: ["75.17x", "75 + 0.17x", "75(0.17x)", "75x ÷ 0.17"], correct: 1, explanation: "$75 base + $0.17 per minute = 75 + 0.17x", source: "Tri 1 Final" },
-      { id: "m24", category: "Expressions", difficulty: "medium", question: "Which expression = '7 fewer than 4 times a number x'?", options: ["7x - 4", "4 - 7x", "4x - 7", "7 - 4x"], correct: 2, explanation: "'4 times' = 4x. '7 fewer than' = subtract 7. Answer: 4x - 7", source: "Tri 1 Final" },
-      { id: "m25", category: "Coordinate Plane", difficulty: "focus", question: "Ordered pair for 3 units RIGHT and 2 units UP from origin?", options: ["(-3, -2)", "(3, 2)", "(2, 3)", "(-3, 2)"], correct: 1, explanation: "RIGHT = +x, UP = +y. Answer: (3, 2). Always x first!", source: "Tri 1 Final" },
-      { id: "m26", category: "Coordinate Plane", difficulty: "medium", question: "If a point is at (-0.5, -0.25), which quadrant?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], correct: 2, explanation: "Both negative = Quadrant III! Q1(+,+) Q2(-,+) Q3(-,-) Q4(+,-)", source: "Tri 1 Final" },
-      { id: "m27", category: "Integers", difficulty: "focus", question: "Temperature was -3°F. It INCREASED by 7°. What's the new temp?", options: ["-10°F", "-4°F", "+4°F", "+10°F"], correct: 2, explanation: "-3 + 7 = +4°F!", source: "Tri 1 Final" },
-      { id: "m28", category: "Integers", difficulty: "focus", question: "Which statement about ABSOLUTE VALUE is true?", options: ["It includes the sign", "It's always negative", "It's the distance from zero", "It only applies to whole numbers"], correct: 2, explanation: "ABSOLUTE VALUE = DISTANCE from zero. Always POSITIVE!", source: "Tri 1 Final" },
-      { id: "m29", category: "Integers", difficulty: "medium", question: "What are OPPOSITES?", options: ["Both positive numbers", "Same distance from 0, opposite sides", "Multiply to equal 1", "Add to equal 1"], correct: 1, explanation: "OPPOSITES = same distance from 0, different sides. Example: 5 and -5!", source: "Tri 1 Final" },
-      { id: "m30", category: "Order of Operations", difficulty: "focus", question: "First step in: (12.9 - 3.1) × 6.2 - 2 + 4³?", options: ["Multiply 3.1 and 6.2", "Add 2 and 4³", "Subtract 3.1 from 12.9", "Subtract 2 from 6.2"], correct: 2, explanation: "PEMDAS! Parentheses first!", source: "Tri 1 Final" },
-      { id: "m31", category: "Order of Operations", difficulty: "medium", question: "What is the LCM of 3 and 7?", options: ["21", "3", "28", "1"], correct: 0, explanation: "3: 3,6,9,12,15,18,21... 7: 7,14,21... First common = 21!", source: "Tri 1 Final" },
-      { id: "m32", category: "Word Problems", difficulty: "hard", question: "Cherries: $4.35/lb, onions: $0.98/lb. $21.45 budget, buy 3 lbs onions. How many lbs cherries?", options: ["4 lbs", "4.5 lbs", "4.75 lbs", "4.25 lbs"], correct: 3, explanation: "Onions: 3×$0.98=$2.94. Left: $18.51. Cherries: $18.51÷$4.35=4.25 lbs!", source: "Tri 1 Final" },
-      { id: "m33", category: "Word Problems", difficulty: "medium", question: "F = ⁹⁄₅ × C + 32. What is 35°C in Fahrenheit?", options: ["95°F", "63°F", "39°F", "103°F"], correct: 0, explanation: "F = ⁹⁄₅ × 35 + 32 = 63 + 32 = 95°F!", source: "Tri 1 Final" },
-      { id: "m34", category: "Word Problems", difficulty: "hard", question: "300 mL fills a beaker to 15%. How much does it hold?", options: ["45 mL", "315 mL", "2000 mL", "450 mL"], correct: 2, explanation: "15% = 300 mL. 100% = 300 ÷ 0.15 = 2000 mL!", source: "Mid-Topic 6" },
-      { id: "m35", category: "Vocabulary", difficulty: "focus", question: "A ratio that compares to 100 is a ___.", options: ["Fraction", "Decimal", "Percent", "Rate"], correct: 2, explanation: "PERCENT = 'per 100'!", source: "Topic 6 Review" },
-    ];
+// ── Spaced Repetition (Leitner Boxes) ──
+// Box 1: review in 1 day, Box 2: 3 days, Box 3: 7 days, Box 4: 14 days, Box 5: 30 days (mastered)
+const LEITNER_INTERVALS = [0, 1, 3, 7, 14, 30]; // days per box (box 0 = new)
 
-    const HeartIcon = ({ filled }) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill={filled ? "#ec4899" : "none"} stroke="#ec4899" strokeWidth="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    );
+function getSRQueue(studentId) {
+  return LS.get(`sr_${studentId}`, {});
+}
+function updateSR(studentId, questionId, correct) {
+  const q = getSRQueue(studentId);
+  const entry = q[questionId] || { box: 0, next: Date.now(), attempts: 0, correct: 0 };
+  entry.attempts++;
+  if (correct) {
+    entry.correct++;
+    entry.box = Math.min(entry.box + 1, 5);
+  } else {
+    entry.box = Math.max(entry.box - 1, 1); // wrong = back one box, minimum box 1
+  }
+  const days = LEITNER_INTERVALS[entry.box] || 1;
+  entry.next = Date.now() + days * 86400000;
+  entry.lastReview = Date.now();
+  q[questionId] = entry;
+  LS.set(`sr_${studentId}`, q);
+}
+function getDueQuestions(studentId) {
+  const q = getSRQueue(studentId);
+  const now = Date.now();
+  return Object.entries(q).filter(([_, e]) => e.next <= now && e.box < 5).map(([id]) => id);
+}
 
-    const historyCategories = [
-      { name: "Focus Areas", color: "bg-gradient-to-r from-red-500 to-pink-500", filter: q => q.difficulty === "focus" },
-      { name: "Government Types", color: "bg-gradient-to-r from-blue-500 to-blue-600", filter: q => q.category === "Government Types" },
-      { name: "Imperialism & Isolationism", color: "bg-gradient-to-r from-purple-500 to-purple-600", filter: q => q.category === "Imperialism & Isolationism" },
-      { name: "3 G's of Exploration", color: "bg-gradient-to-r from-yellow-500 to-orange-500", filter: q => q.category === "3 G's of Exploration" },
-      { name: "Civilizations", color: "bg-gradient-to-r from-green-500 to-green-600", filter: q => q.category === "Civilizations" },
-      { name: "Sources", color: "bg-gradient-to-r from-orange-500 to-red-500", filter: q => q.category === "Sources" },
-      { name: "Medieval Europe", color: "bg-gradient-to-r from-indigo-500 to-indigo-600", filter: q => q.category === "Medieval Europe" },
-      { name: "All Questions", color: "bg-gradient-to-r from-gray-600 to-gray-700", filter: () => true }
-    ];
+// ── Bloom's Taxonomy Levels ──
+const BLOOMS = ['remember', 'understand', 'apply', 'analyze'];
 
-    const mathCategories = [
-      { name: "Focus Areas", color: "bg-gradient-to-r from-red-500 to-pink-500", filter: q => q.difficulty === "focus" },
-      { name: "Percents", color: "bg-gradient-to-r from-purple-500 to-indigo-500", filter: q => q.category === "Percents" },
-      { name: "Fractions", color: "bg-gradient-to-r from-blue-500 to-cyan-500", filter: q => q.category === "Fractions" },
-      { name: "Decimals", color: "bg-gradient-to-r from-green-500 to-emerald-500", filter: q => q.category === "Decimals" },
-      { name: "Expressions", color: "bg-gradient-to-r from-yellow-500 to-orange-500", filter: q => q.category === "Expressions" },
-      { name: "Coordinate Plane", color: "bg-gradient-to-r from-teal-500 to-green-500", filter: q => q.category === "Coordinate Plane" },
-      { name: "Integers", color: "bg-gradient-to-r from-rose-500 to-red-500", filter: q => q.category === "Integers" },
-      { name: "Word Problems", color: "bg-gradient-to-r from-violet-500 to-purple-500", filter: q => q.category === "Word Problems" },
-      { name: "All Questions", color: "bg-gradient-to-r from-gray-600 to-gray-700", filter: () => true }
-    ];
+// ── Subject Configuration ──
+const SUBJECTS = [
+  { id:'math', name:'Math', icon:'🧮', color:'from-blue-500 to-blue-600', bg:'bg-blue-50', tx:'text-blue-600', bd:'border-blue-200', mapRit: 208, mapPct: 44 },
+  { id:'history', name:'History', icon:'🏛️', color:'from-amber-500 to-amber-600', bg:'bg-amber-50', tx:'text-amber-600', bd:'border-amber-200', mapRit: null, mapPct: null },
+  { id:'science', name:'Science', icon:'🔬', color:'from-green-500 to-green-600', bg:'bg-green-50', tx:'text-green-600', bd:'border-green-200', mapRit: null, mapPct: null },
+  { id:'english', name:'English', icon:'📖', color:'from-purple-500 to-purple-600', bg:'bg-purple-50', tx:'text-purple-600', bd:'border-purple-200', mapRit: 215, mapPct: 71 },
+];
 
-    function App() {
-      const [screen, setScreen] = useState('welcome');
-      const [subject, setSubject] = useState(null);
-      const [currentCategory, setCurrentCategory] = useState(null);
-      const [questions, setQuestions] = useState([]);
-      const [currentQuestion, setCurrentQuestion] = useState(0);
-      const [selectedAnswer, setSelectedAnswer] = useState(null);
-      const [showFeedback, setShowFeedback] = useState(false);
-      const [hearts, setHearts] = useState(5);
-      const [xp, setXp] = useState(0);
-      const [streak, setStreak] = useState(0);
-      const [correctAnswers, setCorrectAnswers] = useState(0);
-      const [totalAnswered, setTotalAnswered] = useState(0);
-      const [showCorrectAnimation, setShowCorrectAnimation] = useState(false);
+// ── Question Bank (Bloom's tagged, difficulty calibrated) ──
+const QB = {
+  math: [
+    // Number & Operations (Hayley's LoAvg gap area)
+    {id:'m1',cat:'Number & Operations',bl:'remember',diff:1,q:'What is 1/2 + 1/4?',opts:['1/4','2/4','3/4','1/6'],ans:2,exp:'Find common denominator: 1/2 = 2/4. Then 2/4 + 1/4 = 3/4.'},
+    {id:'m2',cat:'Number & Operations',bl:'remember',diff:1,q:'Simplify 6/8.',opts:['2/4','3/4','1/2','3/8'],ans:1,exp:'Divide both numerator and denominator by 2: 6÷2=3, 8÷2=4. Answer: 3/4.'},
+    {id:'m3',cat:'Number & Operations',bl:'understand',diff:2,q:'What is 2/3 × 3/5?',opts:['6/15','2/5','5/8','1/3'],ans:1,exp:'Multiply tops: 2×3=6. Multiply bottoms: 3×5=15. Simplify 6/15 = 2/5.'},
+    {id:'m4',cat:'Number & Operations',bl:'understand',diff:2,q:'Convert 0.75 to a fraction.',opts:['3/4','7/5','1/2','3/5'],ans:0,exp:'0.75 = 75/100. Divide both by 25: 75÷25=3, 100÷25=4. Answer: 3/4.'},
+    {id:'m5',cat:'Number & Operations',bl:'apply',diff:2,q:'3/4 - 2/5 = ?',opts:['7/20','1/9','1/20','5/9'],ans:0,exp:'Common denominator is 20. 3/4=15/20, 2/5=8/20. 15/20-8/20=7/20.'},
+    {id:'m6',cat:'Number & Operations',bl:'apply',diff:3,q:'Divide 3/4 by 1/2.',opts:['3/8','6/4','1 1/2','3/2'],ans:2,exp:'Flip the second fraction and multiply: 3/4 × 2/1 = 6/4 = 1 1/2.'},
+    {id:'m7',cat:'Number & Operations',bl:'understand',diff:2,q:'Which is greater: 3/5 or 2/3?',opts:['3/5','2/3','They are equal','Cannot tell'],ans:1,exp:'Convert to same denominator: 3/5=9/15, 2/3=10/15. 10/15 > 9/15, so 2/3 is greater.'},
+    {id:'m8',cat:'Number & Operations',bl:'apply',diff:3,q:'A recipe needs 2/3 cup of sugar. You want to make 1 1/2 batches. How much sugar?',opts:['1 cup','2/3 cup','1/2 cup','1 1/3 cups'],ans:0,exp:'2/3 × 3/2 = 6/6 = 1 cup. Remember: 1 1/2 = 3/2.'},
+    {id:'m9',cat:'Number & Operations',bl:'remember',diff:1,q:'What is 3.6 + 2.45?',opts:['5.05','6.05','5.95','6.10'],ans:1,exp:'Line up decimals: 3.60 + 2.45 = 6.05.'},
+    {id:'m10',cat:'Number & Operations',bl:'analyze',diff:3,q:'Maria ate 1/3 of a pizza. Her brother ate 1/4. How much is LEFT?',opts:['5/12','7/12','1/7','2/7'],ans:0,exp:'Eaten: 1/3+1/4=4/12+3/12=7/12. Left: 12/12-7/12=5/12.'},
+    // Measurement & Data (Hayley's second gap area)
+    {id:'m11',cat:'Measurement & Data',bl:'remember',diff:1,q:'How many grams in 1 kilogram?',opts:['10','100','1000','10000'],ans:2,exp:'KILO means 1000. 1 kilogram = 1000 grams. King Henry trick!'},
+    {id:'m12',cat:'Measurement & Data',bl:'understand',diff:2,q:'Convert 3500 mL to liters.',opts:['0.35 L','3.5 L','35 L','350 L'],ans:1,exp:'Divide by 1000: 3500 ÷ 1000 = 3.5 L.'},
+    {id:'m13',cat:'Measurement & Data',bl:'apply',diff:2,q:'A box is 5cm long, 3cm wide, 4cm tall. What is the volume?',opts:['12 cm³','35 cm³','60 cm³','15 cm³'],ans:2,exp:'Volume = L × W × H = 5 × 3 × 4 = 60 cm³.'},
+    {id:'m14',cat:'Measurement & Data',bl:'apply',diff:3,q:'Test scores: 85, 90, 78, 92, 85. What is the mode?',opts:['85','86','90','78'],ans:0,exp:'MODE = most frequent number. 85 appears twice, all others once. Mode = 85.'},
+    {id:'m15',cat:'Measurement & Data',bl:'apply',diff:2,q:'A rectangle has area 40 cm² and length 8 cm. What is the width?',opts:['5 cm','32 cm','48 cm','320 cm'],ans:0,exp:'Area = L × W. So W = Area ÷ L = 40 ÷ 8 = 5 cm.'},
+    // Percentages / Decimals
+    {id:'m16',cat:'Number & Operations',bl:'remember',diff:1,q:'What is 25% of 80?',opts:['15','20','25','40'],ans:1,exp:'25% = 1/4. So 80 ÷ 4 = 20.'},
+    {id:'m17',cat:'Number & Operations',bl:'apply',diff:2,q:'A shirt costs $40 and is 30% off. What is the sale price?',opts:['$28','$12','$30','$10'],ans:0,exp:'30% of $40 = $12 discount. $40 - $12 = $28.'},
+    // Geometry (Hayley's recent homework topic)
+    {id:'m18',cat:'Geometry',bl:'remember',diff:1,q:'How many degrees in a triangle?',opts:['90°','180°','270°','360°'],ans:1,exp:'All triangles have interior angles that add to exactly 180°.'},
+    {id:'m19',cat:'Geometry',bl:'apply',diff:2,q:'A parallelogram has base 12m and height 8m. What is the area?',opts:['20 m²','48 m²','96 m²','192 m²'],ans:2,exp:'Area = base × height = 12 × 8 = 96 m².'},
+    {id:'m20',cat:'Geometry',bl:'apply',diff:2,q:'A rhombus has diagonals 30cm and 20cm. What is the area?',opts:['150 cm²','300 cm²','600 cm²','50 cm²'],ans:1,exp:'Area = (d1 × d2) ÷ 2 = (30 × 20) ÷ 2 = 300 cm².'},
+    // Order of Operations
+    {id:'m21',cat:'Operations & Algebraic Thinking',bl:'apply',diff:2,q:'Solve: 3 + 4 × 2',opts:['14','11','10','8'],ans:1,exp:'PEMDAS! Multiply first: 4×2=8. Then add: 3+8=11.'},
+    {id:'m22',cat:'Operations & Algebraic Thinking',bl:'apply',diff:3,q:'Solve: (6 + 2) × 3 - 4',opts:['20','16','24','12'],ans:0,exp:'Parentheses first: 6+2=8. Multiply: 8×3=24. Subtract: 24-4=20.'},
+  ],
+  history: [
+    {id:'h1',cat:'Government Types',bl:'remember',diff:1,q:'What are the 3 G\'s that motivated conquistadors?',opts:['Guns, Germs, Steel','Gold, God, Glory','Greece, Germany, Gaul','Government, Geography, Growth'],ans:1,exp:'The 3 G\'s: GOLD (wealth), GOD (spreading Christianity), GLORY (fame and power).'},
+    {id:'h2',cat:'Government Types',bl:'understand',diff:2,q:'"The Sapa Inca is a god-like figure who controls the government." What type of government?',opts:['Monarchy','Democracy','Theocracy','Imperialism'],ans:2,exp:'THEOCRACY! THEO = GOD. The Sapa Inca was believed to be divine AND controlled the government.'},
+    {id:'h3',cat:'Government Types',bl:'understand',diff:2,q:'KEY difference between Theocracy and Monarchy?',opts:['Theocracy has voting','In Theocracy the ruler is a GOD; Monarchy the ruler is just a king/queen','Monarchy is older','No difference'],ans:1,exp:'THEOCRACY = ruler is divine. MONARCHY = ruler is human royalty.'},
+    {id:'h4',cat:'Government Types',bl:'analyze',diff:3,q:'How does the Magna Carta differ from Divine Right of Kings?',opts:['Magna Carta LIMITED king\'s power; Divine Right gave ABSOLUTE power','Magna Carta gave more power','Magna Carta established birthright','Magna Carta supported Divine Right'],ans:0,exp:'Magna Carta = LIMITS power. Divine Right = UNLIMITED power from God. They are OPPOSITES!'},
+    {id:'h5',cat:'Imperialism',bl:'remember',diff:1,q:'What is ISOLATIONISM?',opts:['Taking over other lands','Avoiding involvement in other nations\' affairs','Spreading religion','Building an empire'],ans:1,exp:'ISOLATIONISM = ISOLATE = staying ALONE, avoiding other countries\' business.'},
+    {id:'h6',cat:'Imperialism',bl:'understand',diff:2,q:'"Driven by thirst for wealth, we embarked to conquer new lands." This reflects:',opts:['Scientific curiosity','Religious zeal','Economic gain and territorial expansion','Cultural exchange'],ans:2,exp:'Key words: "conquer," "expand," "empire" = IMPERIALISM.'},
+    {id:'h7',cat:'Civilizations',bl:'remember',diff:1,q:'Who conquered the Aztec Empire?',opts:['Francisco Pizarro','Hernan Cortes','The Sapa Inca','King of Spain'],ans:1,exp:'HERNAN CORTES conquered the AZTECS. FRANCISCO PIZARRO conquered the INCAS.'},
+    {id:'h8',cat:'Civilizations',bl:'remember',diff:1,q:'The Aztecs used floating gardens called:',opts:['Terraces','Quipus','Three Sisters','Chinampas'],ans:3,exp:'CHINAMPAS = Aztec floating gardens! Quipus = Inca. Three Sisters = Haudenosaunee.'},
+    {id:'h9',cat:'Civilizations',bl:'understand',diff:2,q:'Which civilization gave women the MOST power?',opts:['Haudenosaunee','Inca','Aztec','None'],ans:0,exp:'HAUDENOSAUNEE! Clan Mothers had real power — they chose the leaders.'},
+    {id:'h10',cat:'Civilizations',bl:'understand',diff:2,q:'"No writing system, recorded through knots and cords." Which group?',opts:['Haudenosaunee','Aztecs','Inca','Europeans'],ans:2,exp:'INCA used QUIPUS (knotted cords) for record-keeping.'},
+    {id:'h11',cat:'Civilizations',bl:'understand',diff:2,q:'Which is TRUE about religion?',opts:['All three groups are monotheistic','Aztecs & Inca monotheistic, Haudenosaunee polytheistic','Haudenosaunee monotheistic, Aztec & Inca polytheistic','Pizarro conquered Aztecs'],ans:2,exp:'Haudenosaunee = ONE god (monotheist). Aztec & Inca = MANY gods (polytheist).'},
+    {id:'h12',cat:'Civilizations',bl:'remember',diff:1,q:'Three Sisters farming grows:',opts:['Three fruits','Rotated crops','Corn, beans, and squash together','Three irrigation methods'],ans:2,exp:'Three Sisters = corn, beans, squash. A HAUDENOSAUNEE practice.'},
+    {id:'h13',cat:'Civilizations',bl:'remember',diff:1,q:'Great Law of Peace was created by:',opts:['Inca','Aztecs','Conquistadors','Haudenosaunee'],ans:3,exp:'The HAUDENOSAUNEE (Iroquois) created the Great Law of Peace.'},
+    {id:'h14',cat:'African Empires',bl:'remember',diff:1,q:'Who was Sunni Ali?',opts:['An Aztec emperor','An Inca priest','Founder of the Songhai Empire','A European explorer'],ans:2,exp:'Sunni Ali founded the Songhai Empire in 1464, conquering Timbuktu and expanding across West Africa.'},
+    {id:'h15',cat:'Imperialism',bl:'understand',diff:2,q:'What was the Berlin Conference?',opts:['A meeting to end WWI','European powers dividing up Africa','A peace treaty','A trade agreement'],ans:1,exp:'The Berlin Conference (1884-1885): European powers divided Africa among themselves. No Africans were invited. Classic imperialism.'},
+  ],
+  science: [
+    {id:'s1',cat:'Biology Basics',bl:'remember',diff:1,q:'What is the basic unit of life?',opts:['Atom','Molecule','Cell','Organ'],ans:2,exp:'The CELL is the basic unit of all living things!'},
+    {id:'s2',cat:'Biology Basics',bl:'remember',diff:1,q:'What does O.R.D.E.R. stand for?',opts:['Obtain, Reproduce, Develop, Evolve, Respond','Organize, React, Deliver, Expand, Repeat','Only, Really, Dumb, Eagles, Run','Open, Read, Delete, Edit, Restore'],ans:0,exp:'O.R.D.E.R. = the 5 things all living things do: Obtain energy, Reproduce, Develop, Evolve, Respond.'},
+    {id:'s3',cat:'Cells',bl:'remember',diff:1,q:'What organelle is the "powerhouse of the cell"?',opts:['Nucleus','Cell Wall','Mitochondria','Ribosome'],ans:2,exp:'MITOCHONDRIA converts food into energy (ATP). It\'s the powerhouse!'},
+    {id:'s4',cat:'Cells',bl:'understand',diff:2,q:'What does the cell membrane do?',opts:['Makes energy','Controls what enters and leaves the cell','Stores DNA','Makes proteins'],ans:1,exp:'The cell membrane is the GATEKEEPER — it controls what goes in and out of the cell.'},
+    {id:'s5',cat:'Cells',bl:'understand',diff:2,q:'Difference between plant and animal cells?',opts:['Plant cells have cell walls and chloroplasts; animal cells don\'t','Animal cells are bigger','Plant cells don\'t have a nucleus','No difference'],ans:0,exp:'Plant cells have CELL WALLS (rigid structure) and CHLOROPLASTS (for photosynthesis). Animal cells have neither.'},
+    {id:'s6',cat:'Life Science',bl:'understand',diff:2,q:'What is photosynthesis?',opts:['Animals eating food','Plants making food from sunlight','Rocks breaking down','Water evaporating'],ans:1,exp:'PHOTO (light) + SYNTHESIS (make). Plants use sunlight + water + CO2 to make glucose.'},
+    {id:'s7',cat:'Earth Science',bl:'remember',diff:1,q:'Three layers of the Earth?',opts:['Air, Water, Land','Crust, Mantle, Core','Soil, Rock, Magma','Top, Middle, Bottom'],ans:1,exp:'Thin CRUST, thick MANTLE, hot CORE.'},
+    {id:'s8',cat:'Earth Science',bl:'understand',diff:2,q:'What causes seasons?',opts:['Distance from Sun','Earth\'s tilted axis','Speed of rotation','Size of the Moon'],ans:1,exp:'Earth is tilted 23.5°. As it orbits, different parts get more direct sunlight.'},
+    {id:'s9',cat:'Physical Science',bl:'remember',diff:1,q:'Three states of matter?',opts:['Hot, Cold, Warm','Solid, Liquid, Gas','Big, Medium, Small','Heavy, Light, Medium'],ans:1,exp:'SOLID (fixed shape), LIQUID (fills container), GAS (fills all space).'},
+    {id:'s10',cat:'Physical Science',bl:'apply',diff:2,q:'Speed = ?',opts:['Time ÷ Distance','Distance × Time','Distance ÷ Time','Force × Mass'],ans:2,exp:'Speed = Distance ÷ Time. 100 miles in 2 hours = 50 mph.'},
+    {id:'s11',cat:'Adaptations',bl:'remember',diff:1,q:'What is a physical adaptation?',opts:['A behavior an animal learns','A body feature that helps survive','A type of food','A habitat change'],ans:1,exp:'PHYSICAL adaptation = BODY feature. Thick fur, sharp claws, camouflage. You could see it in a PHOTO!'},
+    {id:'s12',cat:'Adaptations',bl:'understand',diff:2,q:'Camouflage is an example of:',opts:['Behavioral adaptation','Physical adaptation','Learned behavior','Instinct'],ans:1,exp:'Camouflage is a PHYSICAL adaptation — an animal\'s body blends into its environment.'},
+    {id:'s13',cat:'Science Skills',bl:'apply',diff:2,q:'Convert 50 mL to liters.',opts:['5 L','0.5 L','0.05 L','500 L'],ans:2,exp:'Divide by 1000: 50 ÷ 1000 = 0.05 L. King Henry helps: mL is 3 places smaller than L.'},
+    {id:'s14',cat:'Science Skills',bl:'understand',diff:2,q:'Independent variable vs dependent variable?',opts:['Independent = what you measure, Dependent = what you change','Independent = what you change, Dependent = what you measure','They are the same thing','Neither can be controlled'],ans:1,exp:'I CHANGE the Independent. I MEASURE the Dependent. "I change, I measure!"'},
+  ],
+  english: [
+    {id:'e1',cat:'Grammar',bl:'remember',diff:1,q:'Which word is a NOUN: "The dog ran fast."',opts:['The','dog','ran','fast'],ans:1,exp:'A NOUN is a person, place, thing, or animal. "Dog" is the noun!'},
+    {id:'e2',cat:'Grammar',bl:'remember',diff:1,q:'What is a VERB?',opts:['A person, place, or thing','An action word','A describing word','A connecting word'],ans:1,exp:'A VERB is an ACTION word — it tells what someone or something DOES.'},
+    {id:'e3',cat:'Grammar',bl:'understand',diff:2,q:'Correct subject-verb agreement?',opts:['The dogs runs fast.','The dogs run fast.','The dogs running fast.','The dogs is fast.'],ans:1,exp:'Plural subject (dogs) needs plural verb (run). "Dogs run" not "dogs runs."'},
+    {id:'e4',cat:'Writing',bl:'remember',diff:1,q:'Three parts of an essay?',opts:['Beginning, Middle, End','Title, Body, Summary','Introduction, Body, Conclusion','Thesis, Evidence, Opinion'],ans:2,exp:'INTRODUCTION (hook + thesis), BODY (evidence), CONCLUSION (wrap up).'},
+    {id:'e5',cat:'Writing',bl:'understand',diff:2,q:'What is a THESIS STATEMENT?',opts:['First sentence of any paragraph','The main argument of your essay','A question to the reader','The title'],ans:1,exp:'A THESIS = your MAIN ARGUMENT. It tells the reader what you will prove.'},
+    {id:'e6',cat:'Vocabulary',bl:'remember',diff:1,q:'Prefix "UN-" means?',opts:['Again','Before','Not','After'],ans:2,exp:'UN- means NOT. Unhappy = NOT happy. Unfair = NOT fair.'},
+    {id:'e7',cat:'Vocabulary',bl:'understand',diff:2,q:'"INFER" means?',opts:['State directly','Guess based on evidence','Ignore information','Copy exactly'],ans:1,exp:'INFER = use clues to figure something out. Detective work!'},
+    {id:'e8',cat:'Reading',bl:'understand',diff:2,q:'What is the THEME of a story?',opts:['The main character','The setting','The life lesson or message','The plot summary'],ans:2,exp:'THEME = the LESSON or MESSAGE. Not what happens, but what we LEARN.'},
+    {id:'e9',cat:'Vocabulary',bl:'understand',diff:2,q:'"Loomed ominously" most likely means:',opts:['Appeared small and friendly','Appeared large and threatening','Disappeared quickly','Moved slowly and gently'],ans:1,exp:'LOOMED = appeared large. OMINOUSLY = in a threatening way. Use context clues!'},
+    {id:'e10',cat:'Reading',bl:'understand',diff:2,q:'What is a SIMILE?',opts:['Direct comparison (no like/as)','Comparison using LIKE or AS','Giving human traits to objects','An exaggeration'],ans:1,exp:'SIMILE uses LIKE or AS. "Fast as lightning." SIMILE has "similar" in it!'},
+    {id:'e11',cat:'Reading',bl:'understand',diff:2,q:'P.I.E. stands for:',opts:['Plot, Introduction, End','Persuade, Inform, Entertain','Problem, Inference, Evidence','People, Ideas, Events'],ans:1,exp:'P.I.E. = Author\'s Purpose: Persuade, Inform, or Entertain.'},
+  ]
+};
 
-      const shuffleArray = (array) => [...array].sort(() => Math.random() - 0.5);
-      const getDB = () => subject === 'history' ? historyQuestionDatabase : mathQuestionDatabase;
-      const getCats = () => subject === 'history' ? historyCategories : mathCategories;
+// ── Adaptive Difficulty Engine ──
+function getAdaptiveQuestions(subject, studentId, count = 8) {
+  const all = QB[subject] || [];
+  const sr = getSRQueue(studentId);
+  const due = getDueQuestions(studentId);
+  
+  // Priority 1: Due spaced-repetition questions (max 3)
+  const dueQs = all.filter(q => due.includes(q.id)).slice(0, 3);
+  
+  // Priority 2: Questions they haven't seen yet
+  const unseen = all.filter(q => !sr[q.id] && !dueQs.find(d => d.id === q.id));
+  
+  // Priority 3: Questions they've struggled with (box 1-2)
+  const struggling = all.filter(q => {
+    const e = sr[q.id];
+    return e && e.box <= 2 && !dueQs.find(d => d.id === q.id);
+  });
+  
+  // Build question set: due first, then mix unseen + struggling, sorted by Bloom's level
+  let pool = [...dueQs];
+  const remaining = [...unseen, ...struggling].sort(() => Math.random() - 0.5);
+  pool = [...pool, ...remaining].slice(0, count);
+  
+  // Sort by difficulty for ZPD scaffolding (easy → hard)
+  pool.sort((a, b) => a.diff - b.diff);
+  
+  return pool;
+}
 
-      const startLesson = (catName) => {
-        const cat = getCats().find(c => c.name === catName);
-        const filtered = getDB().filter(cat.filter);
-        setQuestions(shuffleArray(filtered).slice(0, 10));
-        setCurrentCategory(catName);
-        setCurrentQuestion(0);
-        setSelectedAnswer(null);
-        setShowFeedback(false);
-        setHearts(5);
-        setStreak(0);
-        setCorrectAnswers(0);
-        setScreen('quiz');
+/* ══════════════════════════════════════════════════════════════
+   MODULE 1: APP SHELL - Landing, Login, Routing
+   ══════════════════════════════════════════════════════════════ */
+function App() {
+  const [screen, setScreen] = useState('landing');
+  const [user, setUser] = useState(LS.get('user', null));
+  const [students, setStudents] = useState(LS.get('students', []));
+  const [sessions, setSessions] = useState(LS.get('sessions', []));
+  const [parentPin, setParentPin] = useState(LS.get('pin', ''));
+  const [uploadedDocs, setUploadedDocs] = useState(LS.get('docs', []));
+
+  useEffect(() => LS.set('user', user), [user]);
+  useEffect(() => LS.set('students', students), [students]);
+  useEffect(() => LS.set('sessions', sessions), [sessions]);
+  useEffect(() => LS.set('pin', parentPin), [parentPin]);
+  useEffect(() => LS.set('docs', uploadedDocs), [uploadedDocs]);
+
+  const addStudent = (name, grade) => {
+    const s = { id: 'stu_' + Date.now(), name, grade: grade || '5th', created: new Date().toISOString() };
+    setStudents(p => [...p, s]);
+    return s;
+  };
+
+  const recordSession = (studentId, subject, results) => {
+    const s = { id: 'ses_' + Date.now(), studentId, subject, date: new Date().toISOString(), ...results };
+    setSessions(p => [...p, s]);
+  };
+
+  // Routing
+  if (screen === 'landing') return <Landing onStudent={() => setScreen('stu-login')} onParent={() => setScreen('par-login')} />;
+  if (screen === 'stu-login') return <StuLogin students={students} addStudent={addStudent} onSelect={s => { setUser({...s, role:'student'}); setScreen('dashboard'); }} onBack={() => setScreen('landing')} />;
+  if (screen === 'par-login') return <ParLogin pin={parentPin} setPin={p => { setParentPin(p); LS.set('pin', p); }} onOk={() => { setUser({role:'parent'}); setScreen('par-dash'); }} onBack={() => setScreen('landing')} />;
+  if (screen === 'dashboard' && user?.role === 'student') return <Dashboard user={user} sessions={sessions.filter(s=>s.studentId===user.id)} onQuiz={s => setScreen('quiz-'+s)} onTutor={s => setScreen('tutor-'+s)} onReview={() => setScreen('review')} onUpload={() => setScreen('upload')} onLogout={() => { setUser(null); setScreen('landing'); }} />;
+  
+  const qm = screen.match(/^quiz-(.+)$/);
+  if (qm && user?.role === 'student') return <Quiz subject={qm[1]} studentId={user.id} onDone={r => { recordSession(user.id, qm[1], r); setScreen('dashboard'); }} onBack={() => setScreen('dashboard')} />;
+  
+  const tm = screen.match(/^tutor-(.+)$/);
+  if (tm && user?.role === 'student') return <Tutor subject={tm[1]} name={user.name} grade={user.grade} onBack={() => setScreen('dashboard')} />;
+  
+  if (screen === 'review' && user?.role === 'student') return <ReviewMode studentId={user.id} onBack={() => setScreen('dashboard')} />;
+  if (screen === 'upload' && user?.role === 'student') return <DocUpload studentId={user.id} name={user.name} docs={uploadedDocs} setDocs={setUploadedDocs} onBack={() => setScreen('dashboard')} />;
+  if (screen === 'par-dash') return <ParDash students={students} sessions={sessions} addStudent={addStudent} onLogout={() => { setUser(null); setScreen('landing'); }} />;
+  
+  return null;
+}
+
+/* ── Landing ── */
+function Landing({ onStudent, onParent }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.07]">
+        <div className="absolute top-16 left-8 text-8xl">🧮</div>
+        <div className="absolute top-32 right-16 text-7xl">🔬</div>
+        <div className="absolute bottom-32 left-16 text-6xl">📖</div>
+        <div className="absolute bottom-16 right-8 text-8xl">🏛️</div>
+      </div>
+      <div className="relative z-10 text-center max-w-md w-full">
+        <div className="text-6xl mb-3">🚀</div>
+        <h1 className="text-4xl font-black text-white mb-1 tracking-tight">LeapIQ</h1>
+        <p className="text-blue-200/80 mb-2 text-sm font-semibold tracking-wide">ADAPTIVE AI LEARNING</p>
+        <p className="text-blue-300/50 mb-10 text-sm">Meets students where they are. Takes them where they need to go.</p>
+        <button onClick={onStudent} className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold py-4 rounded-2xl mb-3 text-lg shadow-lg shadow-amber-500/25 as95 transition-transform">
+          🎓 I'm a Student
+        </button>
+        <button onClick={onParent} className="w-full bg-white/10 backdrop-blur text-white font-bold py-4 rounded-2xl border border-white/15 text-base as95 transition-transform">
+          👨‍👩‍👧 Parent Dashboard
+        </button>
+        <p className="text-blue-400/30 text-[10px] mt-10 font-semibold tracking-wider">BUILT BY JMCB TECHNOLOGY GROUP</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Student Login ── */
+function StuLogin({ students, addStudent, onSelect, onBack }) {
+  const [name, setName] = useState('');
+  const [grade, setGrade] = useState('5th');
+  const [adding, setAdding] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
+      <button onClick={onBack} className="text-gray-400 text-sm mb-6">&larr; Back</button>
+      <div className="max-w-sm mx-auto">
+        <h1 className="text-2xl font-black text-gray-900 mb-1">Welcome! 👋</h1>
+        <p className="text-gray-500 mb-6 text-sm">Who's learning today?</p>
+        {students.map(s => (
+          <button key={s.id} onClick={() => onSelect(s)} className="w-full flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all as95 mb-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">{s.name[0].toUpperCase()}</div>
+            <div className="text-left"><div className="font-bold text-gray-900">{s.name}</div><div className="text-xs text-gray-400">{s.grade} grade</div></div>
+          </button>
+        ))}
+        {!adding ? (
+          <button onClick={() => setAdding(true)} className="w-full py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-semibold hover:border-blue-400 hover:text-blue-500 transition-colors mt-2">+ New Student</button>
+        ) : (
+          <div className="bg-white p-4 rounded-2xl border border-blue-200 mt-2">
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" className="w-full p-3 border border-gray-200 rounded-xl mb-2 focus:outline-none focus:border-blue-400 font-medium" autoFocus />
+            <select value={grade} onChange={e => setGrade(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 focus:outline-none focus:border-blue-400">
+              {['3rd','4th','5th','6th','7th','8th'].map(g => <option key={g} value={g}>{g} Grade</option>)}
+            </select>
+            <div className="flex gap-2">
+              <button onClick={() => setAdding(false)} className="flex-1 py-2 text-gray-400 font-semibold">Cancel</button>
+              <button onClick={() => { if(name.trim()){ const s=addStudent(name.trim(),grade); setName(''); setAdding(false); onSelect(s); }}} className="flex-1 py-2 bg-blue-500 text-white rounded-xl font-bold as95 transition-transform">Go! 🚀</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Parent Login ── */
+function ParLogin({ pin, setPin, onOk, onBack }) {
+  const [input, setInput] = useState('');
+  const [mode] = useState(pin ? 'enter' : 'create');
+  const [err, setErr] = useState('');
+  const submit = () => {
+    if (mode === 'create') { if(input.length<4){setErr('PIN must be 4+ digits');return;} setPin(input); onOk(); }
+    else { if(input===pin) onOk(); else {setErr('Wrong PIN');setInput('');} }
+  };
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-6">
+      <button onClick={onBack} className="absolute top-6 left-6 text-gray-400 text-sm">&larr; Back</button>
+      <div className="max-w-xs w-full text-center">
+        <div className="text-5xl mb-4">🔒</div>
+        <h1 className="text-2xl font-black text-gray-900 mb-2">{mode==='create'?'Create PIN':'Parent Login'}</h1>
+        <p className="text-gray-400 mb-6 text-sm">{mode==='create'?'Set a PIN to protect the parent dashboard':'Enter your PIN'}</p>
+        <input type="password" inputMode="numeric" value={input} onChange={e=>{setInput(e.target.value.replace(/\D/g,''));setErr('');}} placeholder="PIN" className="w-full p-4 text-center text-2xl tracking-[0.5em] border-2 border-gray-200 rounded-2xl mb-3 focus:outline-none focus:border-blue-400 font-bold" maxLength={8} onKeyDown={e=>e.key==='Enter'&&submit()} />
+        {err && <p className="text-red-500 text-xs mb-3">{err}</p>}
+        <button onClick={submit} className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl as95 transition-transform">{mode==='create'?'Set PIN':'Open Dashboard'}</button>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 2: STUDENT DASHBOARD
+   ══════════════════════════════════════════════════════════════ */
+function Dashboard({ user, sessions, onQuiz, onTutor, onReview, onUpload, onLogout }) {
+  const totalXP = sessions.reduce((s,p) => s+(p.xp||0), 0);
+  const dueCount = getDueQuestions(user.id).length;
+  const today = sessions.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).length;
+  
+  const subjStats = {};
+  SUBJECTS.forEach(s => {
+    const ss = sessions.filter(p => p.subject === s.id);
+    const tQ = ss.reduce((a,p) => a+(p.total||0), 0);
+    const tC = ss.reduce((a,p) => a+(p.correct||0), 0);
+    subjStats[s.id] = { n: ss.length, acc: tQ>0 ? Math.round(tC/tQ*100) : 0 };
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-8">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-5 pt-6 pb-8 rounded-b-3xl">
+        <div className="flex items-center justify-between mb-4">
+          <div><p className="text-blue-200 text-xs">Welcome back</p><h1 className="text-2xl font-black text-white">{user.name} 👋</h1></div>
+          <button onClick={onLogout} className="text-blue-200 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[{v:totalXP,l:'Total XP'},{v:sessions.length,l:'Sessions'},{v:today,l:'Today'}].map(s => (
+            <div key={s.l} className="bg-white/15 rounded-xl p-2.5 text-center"><div className="text-xl font-black text-white">{s.v}</div><div className="text-blue-200 text-[10px]">{s.l}</div></div>
+          ))}
+        </div>
+      </div>
+      <div className="px-5 -mt-3">
+        {/* Review Due */}
+        {dueCount > 0 && (
+          <button onClick={onReview} className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-4 mt-4 mb-2 flex items-center gap-3 as95 transition-transform shadow-lg shadow-orange-500/20">
+            <span className="text-2xl ap">🔄</span>
+            <div className="text-left"><div className="font-bold text-sm">{dueCount} questions due for review</div><div className="text-white/70 text-xs">Spaced repetition keeps it in your brain</div></div>
+          </button>
+        )}
+        
+        {/* Upload Documents */}
+        <button onClick={onUpload} className="w-full bg-white border border-gray-200 rounded-2xl p-3 mt-3 mb-1 flex items-center gap-3 as98 transition-transform hover:border-blue-300">
+          <span className="text-xl">📄</span>
+          <div className="text-left"><div className="font-semibold text-sm text-gray-900">Upload Study Materials</div><div className="text-gray-400 text-[11px]">Tests, worksheets, study guides</div></div>
+          <span className="text-gray-300 ml-auto">→</span>
+        </button>
+
+        <h2 className="text-base font-extrabold text-gray-900 mt-5 mb-3">Choose a Subject</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {SUBJECTS.map(s => (
+            <div key={s.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+              <div className={`bg-gradient-to-r ${s.color} p-3.5`}>
+                <div className="text-2xl mb-0.5">{s.icon}</div>
+                <div className="text-white font-extrabold">{s.name}</div>
+                {s.mapRit && <div className="text-white/60 text-[10px]">MAP: {s.mapRit} RIT ({s.mapPct}th %ile)</div>}
+                {subjStats[s.id].n > 0 && <div className="text-white/60 text-[10px]">{subjStats[s.id].acc}% accuracy</div>}
+              </div>
+              <div className="p-2.5 space-y-1.5">
+                <button onClick={() => onQuiz(s.id)} className={`w-full py-2 ${s.bg} ${s.tx} font-bold rounded-xl text-xs as95 transition-transform`}>📝 Quiz</button>
+                <button onClick={() => onTutor(s.id)} className={`w-full py-2 border ${s.bd} ${s.tx} font-bold rounded-xl text-xs as95 transition-transform`}>🤖 AI Tutor</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {sessions.length > 0 && (
+          <>
+            <h2 className="text-base font-extrabold text-gray-900 mt-6 mb-3">Recent</h2>
+            {sessions.slice(-5).reverse().map((s,i) => {
+              const subj = SUBJECTS.find(x => x.id===s.subject);
+              return (
+                <div key={i} className="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3 mb-2">
+                  <span className="text-lg">{subj?.icon||'📚'}</span>
+                  <div className="flex-1"><div className="font-bold text-xs text-gray-900">{subj?.name} Quiz</div><div className="text-[10px] text-gray-400">{new Date(s.date).toLocaleDateString()}</div></div>
+                  <div className="text-right"><div className="font-bold text-xs">{s.correct}/{s.total}</div><div className="text-[10px] text-gray-400">+{s.xp} XP</div></div>
+                </div>
+              );
+            })}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 3: ADAPTIVE QUIZ ENGINE
+   ══════════════════════════════════════════════════════════════ */
+function Quiz({ subject, studentId, onDone, onBack }) {
+  const [questions] = useState(() => getAdaptiveQuestions(subject, studentId, 8));
+  const [cur, setCur] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [fb, setFb] = useState(false);
+  const [correct, setCorrect] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [streak, setStreak] = useState(0);
+
+  const q = questions[cur];
+  const subj = SUBJECTS.find(s => s.id === subject);
+  if (!q) return <div className="min-h-screen flex items-center justify-center text-gray-400">No questions available yet.</div>;
+
+  const check = () => {
+    if (sel === null) return;
+    setFb(true);
+    const isCorrect = sel === q.ans;
+    updateSR(studentId, q.id, isCorrect);
+    if (isCorrect) { setCorrect(c=>c+1); setXp(x=>x+10+(streak>=2?5:0)); setStreak(s=>s+1); }
+    else setStreak(0);
+  };
+
+  const next = () => {
+    const finalCorrect = correct + (sel === q.ans && !fb ? 0 : 0); // already counted in check
+    if (cur >= questions.length - 1) { onDone({ correct, total: questions.length, xp }); return; }
+    setCur(c=>c+1); setSel(null); setFb(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="p-4 bg-white border-b border-gray-50">
+        <div className="flex items-center gap-3 mb-1.5">
+          <button onClick={onBack} className="text-gray-400 text-lg">&times;</button>
+          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden"><div className={`h-full bg-gradient-to-r ${subj.color} rounded-full transition-all duration-500`} style={{width:`${(cur+1)/questions.length*100}%`}}/></div>
+          <span className="text-[10px] text-gray-400 font-bold">{cur+1}/{questions.length}</span>
+        </div>
+        <div className="flex items-center gap-3 text-[11px]">
+          <span className="text-amber-500 font-bold">⚡ {xp} XP</span>
+          {streak>=2 && <span className="text-orange-500 font-bold">🔥 {streak} streak!</span>}
+          <span className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold ${q.bl==='remember'?'bg-green-100 text-green-700':q.bl==='understand'?'bg-blue-100 text-blue-700':q.bl==='apply'?'bg-purple-100 text-purple-700':'bg-red-100 text-red-700'}`}>
+            {q.bl.charAt(0).toUpperCase()+q.bl.slice(1)}
+          </span>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="max-w-lg mx-auto">
+          <span className={`inline-block px-2.5 py-0.5 ${subj.bg} ${subj.tx} rounded-full text-[10px] font-bold mb-2`}>{q.cat}</span>
+          <h2 className="text-base font-bold text-gray-900 mb-5 leading-relaxed">{q.q}</h2>
+          <div className="space-y-2.5">
+            {q.opts.map((o,i) => (
+              <button key={i} onClick={() => !fb && setSel(i)} className={`w-full p-3.5 rounded-xl text-left font-medium transition-all flex items-center gap-3 as98 text-sm ${
+                fb ? i===q.ans ? 'border-2 border-green-500 bg-green-50' : i===sel ? 'border-2 border-red-500 bg-red-50' : 'border border-gray-100 bg-gray-50 opacity-30'
+                : sel===i ? `border-2 ${subj.bd} ${subj.bg}` : 'border border-gray-200 bg-white'
+              }`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                  fb&&i===q.ans?'bg-green-500 text-white':fb&&i===sel?'bg-red-500 text-white':sel===i?`bg-gradient-to-r ${subj.color} text-white`:'bg-gray-100 text-gray-500'
+                }`}>{String.fromCharCode(65+i)}</div>
+                <span className="flex-1">{o}</span>
+              </button>
+            ))}
+          </div>
+          {fb && (
+            <div className={`mt-4 p-3.5 rounded-xl text-sm ${sel===q.ans?'bg-green-50 border border-green-200':'bg-red-50 border border-red-200'}`}>
+              <p className="font-bold text-xs mb-1">{sel===q.ans?'🎉 Correct! +10 XP':'❌ Not quite!'}</p>
+              <p className="text-gray-700 text-xs leading-relaxed">{q.exp}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="p-4 border-t">
+        <div className="max-w-lg mx-auto">
+          {!fb ? (
+            <button onClick={check} disabled={sel===null} className={`w-full py-3.5 rounded-xl font-bold transition-all as98 ${sel!==null?`bg-gradient-to-r ${subj.color} text-white shadow-lg`:'bg-gray-100 text-gray-300'}`}>Check Answer</button>
+          ) : (
+            <button onClick={next} className={`w-full py-3.5 rounded-xl font-bold bg-gradient-to-r ${subj.color} text-white shadow-lg as98 transition-transform`}>{cur>=questions.length-1?'See Results 🏆':'Continue →'}</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 4: AI TUTOR (Claude API)
+   ══════════════════════════════════════════════════════════════ */
+function Tutor({ subject, name, grade, onBack }) {
+  const [msgs, setMsgs] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const ref = useRef(null);
+  const subj = SUBJECTS.find(s=>s.id===subject);
+
+  useEffect(() => {
+    setMsgs([{ role:'assistant', content:`Hey ${name}! 👋 I'm your ${subj.name} tutor.\n\nAsk me anything! For example:\n• "Explain fractions like I'm 10"\n• "Why did the Aztecs fall?"\n• "Help me with photosynthesis"\n• "Quiz me on grammar"\n\nWhat do you want to work on?` }]);
+  }, []);
+
+  useEffect(() => { ref.current?.scrollIntoView({behavior:'smooth'}); }, [msgs]);
+
+  const send = async () => {
+    if(!input.trim()||loading) return;
+    const msg=input.trim(); setInput('');
+    setMsgs(p=>[...p,{role:'user',content:msg}]);
+    setLoading(true);
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514', max_tokens:1000,
+          system:`You are LeapIQ, a warm and encouraging AI tutor for ${name}, a ${grade} grader studying ${subj.name}.
+
+TEACHING APPROACH (evidence-based pedagogy):
+- Zone of Proximal Development: pitch explanations slightly above current level, scaffold with hints
+- Bloom's Taxonomy: start with Remember/Understand, build to Apply/Analyze
+- Spaced practice: reference concepts from previous questions when relevant
+- Concrete before abstract: always start with real-world examples kids know
+- Growth mindset language: "you're building this skill" not "you got it wrong"
+
+RULES:
+- Simple language for a ${grade} grader
+- Break complex ideas into 2-3 small steps max
+- Use analogies from their world (sports, games, food, school)
+- Emojis: warm but sparse (1-2 per response)
+- Under 150 words unless they ask for detail
+- If wrong, ask a guiding question instead of just telling the answer
+- Use mnemonics and memory tricks
+- Celebrate effort: "Great question!" "I can see you're thinking about this"
+- NEVER condescending. They are capable learners having a hard moment.
+
+HAYLEY'S MAP DATA (if student is Hayley):
+- Math RIT 208 (44th percentile) - dropped from 219 (81st)
+- Weak areas: Number & Operations, Measurement & Data
+- Strong: Algebraic Thinking (HiAvg), Reading (71st percentile)
+- May have testing anxiety in math
+- Currently in Math 180 program at school`,
+          messages: msgs.filter(m=>m.role!=='system').concat({role:'user',content:msg}).map(m=>({role:m.role,content:m.content}))
+        })
+      });
+      const d=await r.json();
+      const reply=d.content?.map(c=>c.text||'').join('')||"Hmm, let me think about that differently. Try asking again?";
+      setMsgs(p=>[...p,{role:'assistant',content:reply}]);
+    } catch { setMsgs(p=>[...p,{role:'assistant',content:"Oops! Having trouble connecting. Try again in a sec. 🔄"}]); }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className={`bg-gradient-to-r ${subj.color} px-4 py-3 flex items-center gap-3`}>
+        <button onClick={onBack} className="text-white/80">&larr;</button>
+        <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
+        <div><div className="text-white font-bold text-sm">{subj.name} Tutor</div><div className="text-white/50 text-[10px]">Ask me anything</div></div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 no-sb">
+        {msgs.map((m,i) => (
+          <div key={i} className={`flex ${m.role==='user'?'justify-end':'justify-start'}`}>
+            <div className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              m.role==='user'?`bg-gradient-to-r ${subj.color} text-white rounded-br-sm`:'bg-white border border-gray-100 text-gray-800 rounded-bl-sm shadow-sm'}`}>{m.content}</div>
+          </div>
+        ))}
+        {loading && <div className="flex justify-start"><div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm p-3 shadow-sm flex gap-1.5">
+          <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{animationDelay:'0ms'}}/>
+          <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{animationDelay:'150ms'}}/>
+          <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{animationDelay:'300ms'}}/>
+        </div></div>}
+        <div ref={ref}/>
+      </div>
+      <div className="p-3 bg-white border-t">
+        <div className="flex gap-2">
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Ask anything..." className="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-300"/>
+          <button onClick={send} disabled={!input.trim()||loading} className={`px-4 rounded-xl font-bold text-sm as95 transition-all ${input.trim()?`bg-gradient-to-r ${subj.color} text-white`:'bg-gray-100 text-gray-300'}`}>Send</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 5: SPACED REPETITION REVIEW MODE
+   ══════════════════════════════════════════════════════════════ */
+function ReviewMode({ studentId, onBack }) {
+  const dueIds = getDueQuestions(studentId);
+  const allQs = [...QB.math,...QB.history,...QB.science,...QB.english];
+  const questions = allQs.filter(q => dueIds.includes(q.id));
+  const [cur, setCur] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [fb, setFb] = useState(false);
+  const [score, setScore] = useState(0);
+
+  if (questions.length === 0) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
+      <div className="text-5xl mb-4">✅</div>
+      <h1 className="text-xl font-black text-gray-900 mb-2">All caught up!</h1>
+      <p className="text-gray-500 text-sm mb-6">No questions due for review. Keep practicing to add more!</p>
+      <button onClick={onBack} className="bg-blue-500 text-white font-bold py-3 px-8 rounded-xl as95 transition-transform">Back to Dashboard</button>
+    </div>
+  );
+
+  const q = questions[cur];
+  if (!q) { onBack(); return null; }
+  const subj = SUBJECTS.find(s => QB[s.id]?.find(x=>x.id===q.id));
+  const sr = getSRQueue(studentId)[q.id] || {};
+
+  const check = () => {
+    if(sel===null) return;
+    setFb(true);
+    const ok = sel===q.ans;
+    updateSR(studentId, q.id, ok);
+    if(ok) setScore(s=>s+1);
+  };
+  const next = () => {
+    if(cur>=questions.length-1) { onBack(); return; }
+    setCur(c=>c+1); setSel(null); setFb(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="p-4 bg-gradient-to-r from-orange-500 to-red-500">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="text-white/80">&times;</button>
+          <div className="flex-1 text-white font-bold text-sm">🔄 Review Mode</div>
+          <span className="text-white/70 text-xs">{cur+1}/{questions.length}</span>
+        </div>
+        <div className="flex items-center gap-2 mt-2 text-[10px] text-white/60">
+          <span>Box {sr.box||1}</span>
+          <span>•</span>
+          <span>{sr.attempts||0} attempts</span>
+          <span>•</span>
+          <span>{sr.correct||0} correct</span>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="max-w-lg mx-auto">
+          <span className="inline-block px-2.5 py-0.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-bold mb-2">{q.cat}</span>
+          <h2 className="text-base font-bold text-gray-900 mb-5 leading-relaxed">{q.q}</h2>
+          <div className="space-y-2.5">
+            {q.opts.map((o,i) => (
+              <button key={i} onClick={() => !fb && setSel(i)} className={`w-full p-3.5 rounded-xl text-left font-medium transition-all flex items-center gap-3 as98 text-sm ${
+                fb ? i===q.ans ? 'border-2 border-green-500 bg-green-50' : i===sel ? 'border-2 border-red-500 bg-red-50' : 'border border-gray-100 opacity-30'
+                : sel===i ? 'border-2 border-orange-400 bg-orange-50' : 'border border-gray-200'
+              }`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                  fb&&i===q.ans?'bg-green-500 text-white':fb&&i===sel?'bg-red-500 text-white':sel===i?'bg-orange-500 text-white':'bg-gray-100 text-gray-500'
+                }`}>{String.fromCharCode(65+i)}</div>
+                <span className="flex-1">{o}</span>
+              </button>
+            ))}
+          </div>
+          {fb && <div className={`mt-4 p-3.5 rounded-xl text-sm ${sel===q.ans?'bg-green-50 border border-green-200':'bg-red-50 border border-red-200'}`}>
+            <p className="font-bold text-xs mb-1">{sel===q.ans?'🎉 Moving up!':'Back to review soon'}</p>
+            <p className="text-gray-700 text-xs leading-relaxed">{q.exp}</p>
+          </div>}
+        </div>
+      </div>
+      <div className="p-4 border-t">
+        {!fb ? <button onClick={check} disabled={sel===null} className={`w-full py-3.5 rounded-xl font-bold as98 ${sel!==null?'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg':'bg-gray-100 text-gray-300'}`}>Check</button>
+        : <button onClick={next} className="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg as98">{cur>=questions.length-1?'Done ✅':'Next →'}</button>}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 6: DOCUMENT UPLOAD + AI QUESTION GENERATION
+   ══════════════════════════════════════════════════════════════ */
+function DocUpload({ studentId, name, docs, setDocs, onBack }) {
+  const [uploading, setUploading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [genQuestions, setGenQuestions] = useState(null);
+  const [practicing, setPracticing] = useState(null);
+  const fileRef = useRef(null);
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    setUploading(true);
+    
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const content = ev.target.result;
+      const isImage = file.type.startsWith('image/');
+      const doc = {
+        id: 'doc_'+Date.now(),
+        name: file.name,
+        type: isImage ? 'image' : 'text',
+        content: isImage ? content : content,
+        date: new Date().toISOString(),
+        studentId
       };
+      setDocs(p => [...p, doc]);
+      setUploading(false);
+    };
+    
+    if(file.type.startsWith('image/')) reader.readAsDataURL(file);
+    else reader.readAsText(file);
+  };
 
-      const checkAnswer = () => {
-        if (selectedAnswer === null) return;
-        setShowFeedback(true);
-        setTotalAnswered(p => p + 1);
-        if (selectedAnswer === questions[currentQuestion].correct) {
-          setCorrectAnswers(p => p + 1);
-          setXp(p => p + 10);
-          setStreak(p => p + 1);
-          setShowCorrectAnimation(true);
-          setTimeout(() => setShowCorrectAnimation(false), 1000);
-        } else {
-          setHearts(p => p - 1);
-          setStreak(0);
-        }
-      };
+  const generateFromDoc = async (doc) => {
+    setGenerating(true);
+    try {
+      const msgContent = doc.type === 'image' 
+        ? [{ type:'image', source:{type:'base64', media_type:'image/jpeg', data: doc.content.split(',')[1]} }, { type:'text', text:'Generate 6 multiple-choice quiz questions from this study material. The student is in 5th grade.' }]
+        : `Generate 6 multiple-choice quiz questions from this study material for a 5th grader named ${name}. Here is the material:\n\n${doc.content.substring(0,3000)}`;
 
-      const nextQuestion = () => {
-        if (currentQuestion >= questions.length - 1 || hearts === 0) setScreen('results');
-        else { setCurrentQuestion(p => p + 1); setSelectedAnswer(null); setShowFeedback(false); }
-      };
-
-      const getCatCount = (filter) => getDB().filter(filter).length;
-
-      if (screen === 'welcome') {
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 text-white">
-            <div className="text-6xl mb-4">🎓</div>
-            <h1 className="text-3xl font-bold mb-2">Hayley's Tutor</h1>
-            <p className="text-slate-400 mb-6 text-center">History • Math • From Your Actual Coursework!</p>
-            <div className="bg-white/10 rounded-2xl p-5 mb-6 w-full max-w-xs">
-              <p className="text-center text-lg">Welcome back, <span className="font-bold text-yellow-300">Hayley!</span></p>
-              <p className="text-center text-slate-400 text-sm mt-2">65+ questions from your BASIS DC tests!</p>
-            </div>
-            <button onClick={() => setScreen('subjects')} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-3 px-10 rounded-2xl text-lg shadow-lg active:scale-95 transition-transform">
-              START LEARNING
-            </button>
-            <p className="mt-6 text-slate-500 text-xs">JMCBTech Educational Services</p>
-          </div>
-        );
-      }
-
-      if (screen === 'subjects') {
-        return (
-          <div className="min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 p-4">
-            <div className="max-w-md mx-auto">
-              <div className="text-center mb-6">
-                <h1 className="text-2xl font-bold text-white">🎓 Choose Your Subject</h1>
-                <div className="flex justify-center gap-6 mt-3 text-white text-sm">
-                  <span>❤️ {hearts}</span><span>⭐ {xp} XP</span><span>🔥 {streak}</span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <button onClick={() => { setSubject('history'); setScreen('lessons'); }} className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-2xl p-5 shadow-xl text-left active:scale-98 transition-transform">
-                  <div className="flex items-center gap-4">
-                    <span className="text-4xl">🏛️</span>
-                    <div>
-                      <h3 className="font-bold text-xl">World History</h3>
-                      <p className="text-blue-200 text-sm">Aztecs • Incas • Medieval Europe</p>
-                      <p className="text-blue-300 text-xs mt-1">{historyQuestionDatabase.length} questions</p>
-                    </div>
-                  </div>
-                </button>
-                <button onClick={() => { setSubject('math'); setScreen('lessons'); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-700 text-white rounded-2xl p-5 shadow-xl text-left active:scale-98 transition-transform">
-                  <div className="flex items-center gap-4">
-                    <span className="text-4xl">🧮</span>
-                    <div>
-                      <h3 className="font-bold text-xl">Math</h3>
-                      <p className="text-indigo-200 text-sm">Percents • Fractions • Expressions</p>
-                      <p className="text-indigo-300 text-xs mt-1">{mathQuestionDatabase.length} questions</p>
-                    </div>
-                  </div>
-                </button>
-              </div>
-              <div className="mt-6 p-3 bg-yellow-500/20 rounded-xl">
-                <p className="text-yellow-200 text-sm text-center">💡 Start with "Focus Areas" - concepts you need to master!</p>
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      if (screen === 'lessons') {
-        const cats = getCats();
-        const isH = subject === 'history';
-        return (
-          <div className={`min-h-screen bg-gradient-to-b ${isH ? 'from-blue-600 to-blue-800' : 'from-indigo-600 to-purple-700'} p-4`}>
-            <div className="max-w-md mx-auto">
-              <div className="flex items-center gap-3 mb-4">
-                <button onClick={() => setScreen('subjects')} className="text-white/70 hover:text-white text-xl">←</button>
-                <h1 className="text-xl font-bold text-white">{isH ? '🏛️ History' : '🧮 Math'}</h1>
-              </div>
-              <div className="bg-white rounded-2xl p-3 mb-4 shadow-xl">
-                <h2 className="font-bold text-gray-800">Choose a Topic</h2>
-              </div>
-              <div className="space-y-2">
-                {cats.map((cat, i) => (
-                  <button key={i} onClick={() => startLesson(cat.name)} className={`w-full ${cat.color} text-white rounded-xl p-3 shadow-lg flex items-center active:scale-98 transition-transform`}>
-                    <div className="flex-1 text-left">
-                      <h3 className="font-bold">{cat.name}</h3>
-                    </div>
-                    <div className="bg-white/20 rounded-full px-2 py-1 text-xs font-bold">{getCatCount(cat.filter)}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      if (screen === 'quiz') {
-        const q = questions[currentQuestion];
-        const prog = (currentQuestion / questions.length) * 100;
-        const isH = subject === 'history';
-        return (
-          <div className="min-h-screen bg-gray-100 flex flex-col">
-            {showCorrectAnimation && <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"><div className="text-7xl animate-bounce">🎉</div></div>}
-            <div className="bg-white p-3 shadow-sm">
-              <div className="max-w-md mx-auto">
-                <div className="h-3 bg-gray-200 rounded-full mb-2 overflow-hidden">
-                  <div className={`h-full ${isH ? 'bg-blue-500' : 'bg-purple-500'} rounded-full transition-all duration-300`} style={{ width: `${prog}%` }} />
-                </div>
-                <div className="flex justify-between items-center">
-                  <button onClick={() => setScreen('lessons')} className="text-gray-400 text-xl">✕</button>
-                  <div className="flex gap-1">{[...Array(5)].map((_, i) => <HeartIcon key={i} filled={i < hearts} />)}</div>
-                  <span className="text-yellow-500 font-bold">⚡{streak}</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex-1 p-3 overflow-y-auto">
-              <div className="max-w-md mx-auto">
-                <div className="bg-white rounded-xl p-4 shadow-lg mb-3">
-                  <div className="flex justify-between text-xs mb-2">
-                    <span className={`${isH ? 'text-blue-600 bg-blue-50' : 'text-purple-600 bg-purple-50'} px-2 py-1 rounded font-medium`}>{q.category}</span>
-                    <span className="text-gray-400">{q.source}</span>
-                  </div>
-                  <h2 className="font-bold text-gray-800 leading-relaxed">{q.question}</h2>
-                </div>
-                <div className="space-y-2">
-                  {q.options.map((opt, i) => (
-                    <button key={i} onClick={() => !showFeedback && setSelectedAnswer(i)} disabled={showFeedback}
-                      className={`w-full p-3 rounded-xl text-left font-medium transition-all flex items-center gap-3 active:scale-98 ${
-                        showFeedback ? (i === q.correct ? 'border-2 border-green-500 bg-green-100' : i === selectedAnswer ? 'border-2 border-red-500 bg-red-100' : 'border border-gray-200 bg-gray-50 opacity-50')
-                        : selectedAnswer === i ? `border-2 ${isH ? 'border-blue-500 bg-blue-50' : 'border-purple-500 bg-purple-50'}` : 'border border-gray-200 bg-white'
-                      }`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                        showFeedback && i === q.correct ? 'bg-green-500 text-white' :
-                        showFeedback && i === selectedAnswer ? 'bg-red-500 text-white' :
-                        selectedAnswer === i ? `${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white` : 'bg-gray-200'
-                      }`}>{String.fromCharCode(65 + i)}</div>
-                      <span className="flex-1 text-sm">{opt}</span>
-                      {showFeedback && i === q.correct && <span className="text-green-600">✓</span>}
-                      {showFeedback && i === selectedAnswer && i !== q.correct && <span className="text-red-600">✗</span>}
-                    </button>
-                  ))}
-                </div>
-                {showFeedback && (
-                  <div className={`mt-3 p-3 rounded-xl ${selectedAnswer === q.correct ? 'bg-green-100 border border-green-400' : 'bg-red-100 border border-red-400'}`}>
-                    <p className="font-bold text-sm mb-1">{selectedAnswer === q.correct ? '🎉 Correct! +10 XP' : '❌ Not quite!'}</p>
-                    <p className="text-gray-700 text-sm">{q.explanation}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="p-3 bg-white border-t">
-              <div className="max-w-md mx-auto">
-                {!showFeedback ? (
-                  <button onClick={checkAnswer} disabled={selectedAnswer === null}
-                    className={`w-full py-3 rounded-xl font-bold transition-all active:scale-98 ${selectedAnswer !== null ? `${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white` : 'bg-gray-200 text-gray-400'}`}>
-                    CHECK ANSWER
-                  </button>
-                ) : (
-                  <button onClick={nextQuestion} className={`w-full py-3 rounded-xl font-bold ${isH ? 'bg-blue-500' : 'bg-purple-500'} text-white active:scale-98 transition-transform`}>
-                    {currentQuestion >= questions.length - 1 || hearts === 0 ? 'SEE RESULTS' : 'CONTINUE →'}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      if (screen === 'results') {
-        const pct = Math.round((correctAnswers / questions.length) * 100);
-        const isH = subject === 'history';
-        return (
-          <div className={`min-h-screen bg-gradient-to-b ${isH ? 'from-blue-600 to-blue-800' : 'from-indigo-600 to-purple-800'} flex flex-col items-center justify-center p-4 text-white`}>
-            <div className="text-6xl mb-3">{pct >= 90 ? '🏆' : pct >= 70 ? '⭐' : pct >= 50 ? '💪' : '📚'}</div>
-            <h1 className="text-2xl font-bold mb-1">{pct >= 90 ? 'Amazing!' : pct >= 70 ? 'Great Job!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!'}</h1>
-            <div className="text-5xl font-bold mb-1">{pct}%</div>
-            <p className="text-white/70 mb-4">{correctAnswers} of {questions.length} correct</p>
-            <div className="bg-white/20 rounded-xl p-4 mb-6 w-full max-w-xs">
-              <div className="flex justify-around text-center">
-                <div><div className="text-2xl font-bold">{xp}</div><div className="text-xs text-white/70">Total XP</div></div>
-                <div><div className="text-2xl font-bold">{streak}</div><div className="text-xs text-white/70">Best Streak</div></div>
-              </div>
-            </div>
-            <div className="flex gap-3 flex-wrap justify-center">
-              <button onClick={() => startLesson(currentCategory)} className="bg-white/20 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">🔄 Try Again</button>
-              <button onClick={() => setScreen('lessons')} className="bg-white/20 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">{isH ? '🏛️' : '🧮'} Topics</button>
-              <button onClick={() => setScreen('subjects')} className="bg-yellow-500 text-white font-bold py-2 px-4 rounded-xl text-sm active:scale-95 transition-transform">🎓 Switch</button>
-            </div>
-          </div>
-        );
-      }
-      return null;
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514', max_tokens:2000,
+          system:`You generate quiz questions from uploaded study materials. Return ONLY valid JSON array, no markdown, no backticks. Each object: {"q":"question text","opts":["A","B","C","D"],"ans":0,"exp":"explanation","cat":"category"}. ans is 0-indexed. Make questions age-appropriate for a 5th grader. Mix Bloom's levels: some remember, some understand, some apply.`,
+          messages:[{role:'user', content: msgContent}]
+        })
+      });
+      const d = await r.json();
+      const text = d.content?.map(c=>c.text||'').join('') || '[]';
+      const clean = text.replace(/```json|```/g,'').trim();
+      const qs = JSON.parse(clean);
+      setGenQuestions(qs);
+    } catch(err) {
+      console.error(err);
+      setGenQuestions([]);
     }
+    setGenerating(false);
+  };
 
-    ReactDOM.render(<App />, document.getElementById('root'));
-  </script>
+  // Practice generated questions
+  if (practicing !== null && genQuestions) {
+    return <GenQuizPractice questions={genQuestions} studentId={studentId} onBack={() => {setPracticing(null);setGenQuestions(null);}} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-5">
+      <button onClick={onBack} className="text-gray-400 text-sm mb-4">&larr; Back</button>
+      <h1 className="text-xl font-black text-gray-900 mb-1">📄 Study Materials</h1>
+      <p className="text-gray-500 text-sm mb-6">Upload tests, worksheets, or study guides. AI will generate practice questions from them.</p>
+      
+      <input ref={fileRef} type="file" accept="image/*,.txt,.pdf" className="hidden" onChange={handleFile} />
+      <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full bg-white border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-blue-400 transition-colors as98">
+        <div className="text-3xl mb-2">{uploading ? '⏳' : '📎'}</div>
+        <div className="font-bold text-gray-700 text-sm">{uploading ? 'Uploading...' : 'Tap to upload'}</div>
+        <div className="text-gray-400 text-xs">Photos, text files, or PDFs</div>
+      </button>
+
+      {/* Generated Questions */}
+      {generating && (
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+          <div className="text-2xl mb-2 ap">🤖</div>
+          <p className="text-blue-700 font-bold text-sm">Generating questions from your material...</p>
+        </div>
+      )}
+      {genQuestions && genQuestions.length > 0 && (
+        <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-4">
+          <p className="text-green-700 font-bold text-sm mb-3">✅ {genQuestions.length} questions generated!</p>
+          <button onClick={() => setPracticing(true)} className="w-full bg-green-500 text-white font-bold py-3 rounded-xl as95 transition-transform">Practice Now 🚀</button>
+        </div>
+      )}
+
+      {/* Uploaded docs */}
+      {docs.filter(d=>d.studentId===studentId).length > 0 && (
+        <>
+          <h2 className="font-bold text-gray-900 mt-6 mb-3 text-sm">Uploaded Materials</h2>
+          {docs.filter(d=>d.studentId===studentId).reverse().map(doc => (
+            <div key={doc.id} className="bg-white rounded-xl border border-gray-200 p-3 mb-2 flex items-center gap-3">
+              <span className="text-lg">{doc.type==='image'?'🖼️':'📝'}</span>
+              <div className="flex-1"><div className="font-semibold text-xs text-gray-900">{doc.name}</div><div className="text-[10px] text-gray-400">{new Date(doc.date).toLocaleDateString()}</div></div>
+              <button onClick={() => generateFromDoc(doc)} disabled={generating} className="text-blue-500 text-xs font-bold as95">Generate Quiz</button>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Practice Generated Questions ── */
+function GenQuizPractice({ questions, studentId, onBack }) {
+  const [cur, setCur] = useState(0);
+  const [sel, setSel] = useState(null);
+  const [fb, setFb] = useState(false);
+  const [score, setScore] = useState(0);
+
+  if (cur >= questions.length) return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-600 to-indigo-700 flex flex-col items-center justify-center p-6 text-white">
+      <div className="text-5xl mb-3">{score/questions.length>=0.8?'🏆':score/questions.length>=0.6?'⭐':'💪'}</div>
+      <div className="text-4xl font-black mb-1">{Math.round(score/questions.length*100)}%</div>
+      <p className="text-white/70 mb-6">{score} of {questions.length} correct</p>
+      <button onClick={onBack} className="bg-white/20 text-white font-bold py-3 px-8 rounded-xl as95">Done</button>
+    </div>
+  );
+
+  const q = questions[cur];
+  const check = () => { if(sel===null) return; setFb(true); if(sel===q.ans) setScore(s=>s+1); };
+  const next = () => { setCur(c=>c+1); setSel(null); setFb(false); };
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="p-4 bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center gap-3">
+        <button onClick={onBack} className="text-white/80">&times;</button>
+        <span className="text-white font-bold text-sm flex-1">📄 From Your Materials</span>
+        <span className="text-white/60 text-xs">{cur+1}/{questions.length}</span>
+      </div>
+      <div className="flex-1 p-5 overflow-y-auto">
+        <span className="inline-block px-2.5 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[10px] font-bold mb-2">{q.cat||'Study Guide'}</span>
+        <h2 className="text-base font-bold text-gray-900 mb-5">{q.q}</h2>
+        <div className="space-y-2.5">
+          {q.opts.map((o,i) => (
+            <button key={i} onClick={() => !fb && setSel(i)} className={`w-full p-3.5 rounded-xl text-left flex items-center gap-3 as98 text-sm ${
+              fb ? i===q.ans?'border-2 border-green-500 bg-green-50':i===sel?'border-2 border-red-500 bg-red-50':'border border-gray-100 opacity-30'
+              : sel===i?'border-2 border-purple-400 bg-purple-50':'border border-gray-200'
+            }`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                fb&&i===q.ans?'bg-green-500 text-white':fb&&i===sel?'bg-red-500 text-white':sel===i?'bg-purple-500 text-white':'bg-gray-100 text-gray-500'}`}>{String.fromCharCode(65+i)}</div>
+              <span className="flex-1">{o}</span>
+            </button>
+          ))}
+        </div>
+        {fb && <div className={`mt-4 p-3.5 rounded-xl text-xs ${sel===q.ans?'bg-green-50 border border-green-200':'bg-red-50 border border-red-200'}`}>
+          <p className="font-bold mb-1">{sel===q.ans?'🎉 Nice!':'Keep going!'}</p>
+          <p className="text-gray-700 leading-relaxed">{q.exp}</p>
+        </div>}
+      </div>
+      <div className="p-4 border-t">
+        {!fb ? <button onClick={check} disabled={sel===null} className={`w-full py-3.5 rounded-xl font-bold as98 ${sel!==null?'bg-gradient-to-r from-indigo-500 to-purple-500 text-white':'bg-gray-100 text-gray-300'}`}>Check</button>
+        : <button onClick={next} className="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white as98">
+          {cur>=questions.length-1?'See Results 🏆':'Continue →'}
+        </button>}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE 7: PARENT DASHBOARD
+   ══════════════════════════════════════════════════════════════ */
+function ParDash({ students, sessions, addStudent, onLogout }) {
+  const [newName, setNewName] = useState('');
+  const [newGrade, setNewGrade] = useState('5th');
+  const [adding, setAdding] = useState(false);
+  const [expanded, setExpanded] = useState(null);
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-8">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-5 pt-6 pb-8 rounded-b-3xl">
+        <div className="flex items-center justify-between mb-2">
+          <div><p className="text-slate-400 text-xs">Parent Dashboard</p><h1 className="text-2xl font-black text-white">LeapIQ 📊</h1></div>
+          <button onClick={onLogout} className="text-slate-400 text-[10px] bg-white/10 px-3 py-1 rounded-full">Logout</button>
+        </div>
+        <p className="text-slate-400 text-xs">Track learning progress across all subjects.</p>
+      </div>
+      <div className="px-5 -mt-3">
+        {students.map(s => {
+          const ss = sessions.filter(p => p.studentId === s.id);
+          const xp = ss.reduce((a,p) => a+(p.xp||0), 0);
+          const open = expanded === s.id;
+          const sr = getSRQueue(s.id);
+          const mastered = Object.values(sr).filter(e => e.box >= 5).length;
+          const learning = Object.values(sr).filter(e => e.box >= 1 && e.box < 5).length;
+
+          const breakdown = {};
+          SUBJECTS.forEach(subj => {
+            const sub = ss.filter(p => p.subject === subj.id);
+            const tQ = sub.reduce((a,p) => a+(p.total||0), 0);
+            const tC = sub.reduce((a,p) => a+(p.correct||0), 0);
+            breakdown[subj.id] = { n:sub.length, tQ, tC, acc: tQ>0 ? Math.round(tC/tQ*100) : 0 };
+          });
+
+          return (
+            <div key={s.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-3">
+              <button onClick={() => setExpanded(open?null:s.id)} className="w-full p-4 flex items-center gap-4 text-left">
+                <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">{s.name[0].toUpperCase()}</div>
+                <div className="flex-1"><div className="font-bold text-gray-900 text-sm">{s.name}</div><div className="text-[10px] text-gray-400">{ss.length} sessions · {xp} XP · {mastered} mastered</div></div>
+                <span className={`text-gray-400 transition-transform ${open?'rotate-90':''}`}>›</span>
+              </button>
+              {open && (
+                <div className="px-4 pb-4 border-t border-gray-50 pt-3 af">
+                  {ss.length === 0 ? <p className="text-gray-400 text-xs text-center py-4">No sessions yet.</p> : (
+                    <div className="space-y-3">
+                      {/* Subject breakdown */}
+                      {SUBJECTS.map(subj => {
+                        const b = breakdown[subj.id];
+                        return (
+                          <div key={subj.id} className="flex items-center gap-3">
+                            <span className="text-lg w-7">{subj.icon}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1"><span className="text-xs font-bold text-gray-900">{subj.name}</span><span className="text-[10px] text-gray-400">{b.n} sessions</span></div>
+                              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className={`h-full bg-gradient-to-r ${subj.color} rounded-full`} style={{width:`${b.acc}%`}}/></div>
+                              <div className="text-[10px] text-gray-400 mt-0.5">{b.tC}/{b.tQ} correct ({b.acc}%)</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {/* Spaced rep stats */}
+                      <div className="pt-3 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-green-50 rounded-lg p-2"><div className="text-green-700 font-black text-lg">{mastered}</div><div className="text-[9px] text-green-600">Mastered</div></div>
+                        <div className="bg-blue-50 rounded-lg p-2"><div className="text-blue-700 font-black text-lg">{learning}</div><div className="text-[9px] text-blue-600">Learning</div></div>
+                        <div className="bg-orange-50 rounded-lg p-2"><div className="text-orange-700 font-black text-lg">{getDueQuestions(s.id).length}</div><div className="text-[9px] text-orange-600">Due</div></div>
+                      </div>
+                      {/* Recent sessions */}
+                      <div className="pt-3 border-t border-gray-100">
+                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-2">Recent Sessions</div>
+                        {ss.slice(-5).reverse().map((sess,i) => {
+                          const subj = SUBJECTS.find(x=>x.id===sess.subject);
+                          const pct = sess.total>0?Math.round(sess.correct/sess.total*100):0;
+                          return (
+                            <div key={i} className="flex items-center gap-2 py-1 text-[11px]">
+                              <span>{subj?.icon}</span>
+                              <span className="text-gray-600">{new Date(sess.date).toLocaleDateString()}</span>
+                              <span className="flex-1"/>
+                              <span className={`font-bold ${pct>=80?'text-green-600':pct>=60?'text-amber-600':'text-red-500'}`}>{pct}%</span>
+                              <span className="text-gray-400">({sess.correct}/{sess.total})</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {!adding ? (
+          <button onClick={() => setAdding(true)} className="w-full py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 font-semibold hover:border-blue-400 transition-colors mt-4 text-sm">+ Add Student</button>
+        ) : (
+          <div className="bg-white p-4 rounded-2xl border border-gray-200 mt-4">
+            <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="Student name" className="w-full p-3 border border-gray-200 rounded-xl mb-2 text-sm focus:outline-none focus:border-blue-400" autoFocus/>
+            <select value={newGrade} onChange={e=>setNewGrade(e.target.value)} className="w-full p-3 border border-gray-200 rounded-xl mb-3 text-sm">
+              {['3rd','4th','5th','6th','7th','8th'].map(g=><option key={g} value={g}>{g} Grade</option>)}
+            </select>
+            <div className="flex gap-2">
+              <button onClick={()=>setAdding(false)} className="flex-1 py-2 text-gray-400 font-semibold text-sm">Cancel</button>
+              <button onClick={()=>{if(newName.trim()){addStudent(newName.trim(),newGrade);setNewName('');setAdding(false);}}} className="flex-1 py-2 bg-blue-500 text-white rounded-xl font-bold text-sm">Add</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════════════════════════════ */
+ReactDOM.render(<App/>, document.getElementById('root'));
+</script>
 </body>
 </html>
